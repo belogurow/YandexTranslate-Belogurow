@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 // url = https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20170314T185242Z.999b1fe140aa0411.51001ae9e89efdf73f40ad571ba71b214cc62f02&text=<переводимый текст>&lang=en-ru
@@ -47,21 +48,26 @@ public class MainActivity extends AppCompatActivity implements DownloadTask.Down
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
 
             @Override
-            public void afterTextChanged(final Editable s) {
+            public void afterTextChanged(Editable s) {
                 mProgressBar.setVisibility(ProgressBar.VISIBLE);
                 mButtonDeleteInputText.setVisibility(Button.VISIBLE);
 
+                try {
+                    String text = URLEncoder.encode(s.toString(), "UTF-8");
 
-                new DownloadTask(new DownloadTask.DownloadResponse() {
-                    @Override
-                    public void processFinish(String output) {
-                        mTextViewTranslate.setText(output);
-                        mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-                    }
-                }).execute("https://translate.yandex.net/api/v1.5/tr.json/translate?" +
-                        "key=" + KEY_TRANSLATE +
-                        "&text=" + s.toString() +
-                        "&lang=en-ru");
+                    new DownloadTask(new DownloadTask.DownloadResponse() {
+                        @Override
+                        public void processFinish(String output) {
+                            mTextViewTranslate.setText(output);
+                            mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+                        }
+                    }).execute("https://translate.yandex.net/api/v1.5/tr.json/translate?" +
+                            "key=" + KEY_TRANSLATE +
+                            "&text=" + text +
+                            "&lang=en-ru");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 // Timer для того, чтобы запросы не посылались при каждом разе,
                 // когда пользователь добавлял или удалял букву,
                 // а посылались с некоторой задержкой(500 миллисекунд)
