@@ -1,4 +1,4 @@
-package com.alexbelogurow.yandextranslate;
+package com.alexbelogurow.yandextranslate.AsyncTask;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -17,14 +17,14 @@ import java.net.URL;
  * Created by alexbelogurow on 22.03.17.
  */
 
-public class DownloadTask extends AsyncTask<String, Void, String> {
+public class TranslateTask extends AsyncTask<String, Void, String> {
     public interface DownloadResponse {
         void processFinish(String output);
     }
 
     public DownloadResponse delegate = null;
 
-    public DownloadTask(DownloadResponse delegate){
+    public TranslateTask(DownloadResponse delegate){
         this.delegate = delegate;
     }
 
@@ -58,11 +58,11 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
     }
 
     @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
-
+    protected void onPostExecute(String result) {
+        super.onPostExecute(result);
+        
         try {
-            JSONObject jsonObject = new JSONObject(s);
+            JSONObject jsonObject = new JSONObject(result);
             JSONArray text = jsonObject.getJSONArray("text");
             String translated = text.getString(0);
             Log.i("Translated", translated);
