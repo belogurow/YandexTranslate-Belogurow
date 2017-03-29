@@ -3,6 +3,8 @@ package com.alexbelogurow.yandextranslate.AsyncTask;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.alexbelogurow.yandextranslate.Activity.MainActivity;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -53,32 +55,22 @@ public class LanguageTask extends AsyncTask<String, Void, String> {
         super.onPostExecute(result);
 
         try {
-            JSONObject langs = new JSONObject(result);
-            JSONObject langs2 = langs.getJSONObject("langs");
-            Iterator<?> keys = langs2.keys();
+            JSONObject jsonObject = new JSONObject(result);
+            JSONObject langs = jsonObject.getJSONObject("langs");
+            Iterator<?> keys = langs.keys();
             //Log.i("Array", jsonArray.toString());
             while (keys.hasNext()) {
                 String key = keys.next().toString();
-                Log.i("o", key + " : " + langs2.getString(key));
+                Log.i("o", key + " : " + langs.getString(key));
+                MainActivity.languages.put(key, langs.getString(key));
             }
-            Log.i("Language", langs.getString("langs"));
+            //Log.i("Language", langs.getString("langs"));
 
 
+            //Log.i("HashMap2", MainActivity.languages.toString());
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-
-        /*try {
-            JSONObject jsonObject = new JSONObject(s);
-            JSONArray text = jsonObject.getJSONArray("text");
-            String translated = text.getString(0);
-            Log.i("Dictionary", translated);
-            //delegate.processFinish(translated);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } */
     }
 }

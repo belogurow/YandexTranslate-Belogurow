@@ -1,10 +1,12 @@
 package com.alexbelogurow.yandextranslate.Activity;
 
+import android.content.Intent;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,6 +27,9 @@ public class MainActivity extends AppCompatActivity implements TranslateTask.Dow
             KEY_TRANSLATE = "trnsl.1.1.20170314T185242Z.999b1fe140aa0411.51001ae9e89efdf73f40ad571ba71b214cc62f02",
             KEY_DICTIONARY = "dict.1.1.20170314T202833Z.600119660f570864.0875e9d92a265c752e3c59235b85f83e29a01a1e";
 
+    private final int REQUEST_CODE_LANG_FROM = 1,
+            REQUEST_CODE_LANG_TO = 2;
+
     private EditText mEditTextInput;
     private TextView mTextViewTranslate;
     private ProgressBar mProgressBar;
@@ -32,6 +37,9 @@ public class MainActivity extends AppCompatActivity implements TranslateTask.Dow
 
     private TextView mTextViewLangFrom;
     private TextView mTextViewLangTo;
+
+    private String langFrom = "ru";
+    private String langTo = "en";
 
     public static ArrayMap<String, String> languages;
 
@@ -51,15 +59,30 @@ public class MainActivity extends AppCompatActivity implements TranslateTask.Dow
         mTextViewLangTo = (TextView) findViewById(R.id.textViewLangTo);
 
         languages = new ArrayMap<>();
-        /*languages.put("en", "Английский");
-        languages.put("ru", "Русский");
-        Log.i("HashMap", languages.toString());
-        Log.i("HashMap", languages.keyAt(1) + " : " + languages.valueAt(1)); */
+
+        mTextViewLangFrom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent getLanguage = new Intent(MainActivity.this, GetLanguageActivity.class);
+                startActivityForResult(getLanguage, REQUEST_CODE_LANG_FROM);
+            }
+        });
+
+
+        mTextViewLangTo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent getLanguage = new Intent(MainActivity.this, GetLanguageActivity.class);
+                startActivityForResult(getLanguage, REQUEST_CODE_LANG_TO);
+            }
+        });
+
 
         new LanguageTask()
                 .execute("https://translate.yandex.net/api/v1.5/tr.json/getLangs?" +
                         "key=" + KEY_TRANSLATE +
                         "&ui=ru");
+
 
         // addTextChangedListener отслеживает изменение текста в mEditTextView,
         // и если он произошел, отправляет запрос на получение json с переводом
@@ -87,14 +110,15 @@ public class MainActivity extends AppCompatActivity implements TranslateTask.Dow
                     }).execute("https://translate.yandex.net/api/v1.5/tr.json/translate?" +
                             "key=" + KEY_TRANSLATE +
                             "&text=" + text +
-                            "&lang=en-ru");
+                            "&lang=" + langFrom + "-" + langTo);
 
 
+                    // TODO добавить проверку на наличие языка
                     new DictionaryTask()
                             .execute("https://dictionary.yandex.net/api/v1/dicservice.json/lookup?" +
                                     "key=" + KEY_DICTIONARY +
-                                    "&lang=en-ru" +
                                     "&text=" + text +
+                                    "&lang=" + langFrom + "-" + langTo +
                                     "&ui=ru");
 
 
@@ -135,4 +159,25 @@ public class MainActivity extends AppCompatActivity implements TranslateTask.Dow
         mEditTextInput.setText("");
         view.setVisibility(View.INVISIBLE);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        int number = data.getIntExtra("numberOfKey", -1);
+
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_CODE_LANG_FROM:
+                    mTextViewLangFrom.setText(languages.valueAt(number));
+                    langFrom = languages.keyAt(number);
+                case REQUEST_CODE_LANG_TO:
+                    mTextViewLangTo.setText(languages.valueAt(number));
+                    langTo = languages.keyAt(number);
+            }
+        }
+
+        mEditTextInput.setText(mEditTextInput.getText());
+    }
+
 }
