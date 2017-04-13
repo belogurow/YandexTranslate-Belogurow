@@ -19,7 +19,7 @@ import java.net.URL;
 
 public class TranslateTask extends AsyncTask<String, Void, String> {
     public interface DownloadResponse {
-        void processFinish(String output);
+        void processTranslateFinish(String output);
     }
 
     public DownloadResponse delegate = null;
@@ -66,7 +66,7 @@ public class TranslateTask extends AsyncTask<String, Void, String> {
             JSONArray text = jsonObject.getJSONArray("text");
             String translated = text.getString(0);
             Log.i("Translated", translated);
-            delegate.processFinish(translated);
+            delegate.processTranslateFinish(translated);
 
         } catch (JSONException e) {
             e.printStackTrace();

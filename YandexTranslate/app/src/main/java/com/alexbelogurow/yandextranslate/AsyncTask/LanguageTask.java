@@ -21,6 +21,7 @@ import java.util.Iterator;
 
 public class LanguageTask extends AsyncTask<String, Void, String> {
 
+
     @Override
     protected String doInBackground(String... urls) {
         String result = "";
@@ -61,7 +62,7 @@ public class LanguageTask extends AsyncTask<String, Void, String> {
             //Log.i("Array", jsonArray.toString());
             while (keys.hasNext()) {
                 String key = keys.next().toString();
-                Log.i("o", key + " : " + langs.getString(key));
+                //Log.i("o", key + " : " + langs.getString(key));
                 MainActivity.languages.put(key, langs.getString(key));
             }
             //Log.i("Language", langs.getString("langs"));
