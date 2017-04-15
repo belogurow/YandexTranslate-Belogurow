@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mTextViewDictionary.setText(s);
-
+        // FIXME вылетает при нажатии кнопки назад
         new LanguageTask()
                 .execute("https://translate.yandex.net/api/v1.5/tr.json/getLangs?" +
                         "key=" + KEY_TRANSLATE +
@@ -171,8 +171,10 @@ public class MainActivity extends AppCompatActivity {
             new TranslateTask(new TranslateTask.DownloadResponse() {
                 @Override
                 public void processTranslateFinish(String output) {
+
                     mTextViewTranslate.setText(output);
                     mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+
                 }
             }).execute("https://translate.yandex.net/api/v1.5/tr.json/translate?" +
                     "key=" + KEY_TRANSLATE +
@@ -184,8 +186,10 @@ public class MainActivity extends AppCompatActivity {
             new DictionaryTask(new DictionaryTask.DownloadResponse() {
                 @Override
                 public void processDictionaryFinish(String output) {
+
                     mTextViewDictionary.setText(output);
                     //Log.i("dictOfTranslate", dictOfTranslate.toString());
+
                 }
             }).execute("https://dictionary.yandex.net/api/v1/dicservice.json/lookup?" +
                             "key=" + KEY_DICTIONARY +
