@@ -204,8 +204,8 @@ public class TranslationTab extends Fragment {
                     {
                         translation.setText(mEditTextInput.getText().toString());
                         translation.setTranslatedText(mTextViewTranslate.getText().toString());
-                        translation.setFrom(mTextViewLangFrom.getText().toString());
-                        translation.setTo(mTextViewLangTo.getText().toString());
+                        translation.setFrom(langFrom);
+                        translation.setTo(langTo);
 
                         dbHandler.addTranslation(translation);
                     }

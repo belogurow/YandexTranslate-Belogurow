@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.alexbelogurow.yandextranslate.helper.Translate;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -111,7 +112,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
         List<Translate> translationsList = new ArrayList<>();
         // Select All Query
-        String selectQuery = "SELECT  * FROM " + TABLE_TRANSLATION;
+        String selectQuery = "SELECT * FROM " + TABLE_TRANSLATION;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -130,6 +131,10 @@ public class DBHandler extends SQLiteOpenHelper {
                 translationsList.add(translate);
             } while (cursor.moveToNext());
         }
+        cursor.close();
+        db.close();
+
+        Collections.reverse(translationsList);
 
         // return contact list
         return translationsList;
@@ -146,13 +151,16 @@ public class DBHandler extends SQLiteOpenHelper {
 
 
     public int getTranslationsCount() {
-        String countQuery = "SELECT  * FROM " + TABLE_TRANSLATION;
+        String countQuery = "SELECT * FROM " + TABLE_TRANSLATION;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
+        int count = cursor.getCount();
+
         cursor.close();
+        db.close();
 
         // return count
-        return cursor.getCount();
+        return count;
     }
 
 }
