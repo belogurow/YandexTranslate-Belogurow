@@ -1,8 +1,11 @@
 package com.alexbelogurow.yandextranslate.asyncTask;
 
 import android.os.AsyncTask;
+import android.support.v4.util.ArrayMap;
+import android.util.Log;
 
 import com.alexbelogurow.yandextranslate.activity.MainActivity;
+import com.alexbelogurow.yandextranslate.tabs.TranslationTab;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,6 +22,16 @@ import java.util.Iterator;
  */
 
 public class LanguageTask extends AsyncTask<String, Void, String> {
+    public interface DownloadResponse {
+        void processLangsFinish(ArrayMap<String, String> output);
+    }
+
+    public LanguageTask.DownloadResponse delegate = null;
+
+    public LanguageTask(LanguageTask.DownloadResponse delegate){
+        this.delegate = delegate;
+    }
+
 
 
     @Override
@@ -58,17 +71,20 @@ public class LanguageTask extends AsyncTask<String, Void, String> {
             JSONObject jsonObject = new JSONObject(result);
             JSONObject langs = jsonObject.getJSONObject("langs");
             Iterator<?> keys = langs.keys();
+            ArrayMap<String, String> arrayOfLangs = new ArrayMap<>();
             //Log.i("Array", jsonArray.toString());
             while (keys.hasNext()) {
                 String key = keys.next().toString();
                 //Log.i("o", key + " : " + langs.getString(key));
-                MainActivity.languages.put(key, langs.getString(key));
+                arrayOfLangs.put(key, langs.getString(key));
+                //TranslationTab.languages.put(key, langs.getString(key));
+                //MainActivity.languages.put(key, langs.getString(key));
             }
             //Log.i("Language", langs.getString("langs"));
 
 
             //Log.i("HashMap2", MainActivity.languages.toString());
-
+            delegate.processLangsFinish(arrayOfLangs);
         } catch (JSONException e) {
             e.printStackTrace();
         }
