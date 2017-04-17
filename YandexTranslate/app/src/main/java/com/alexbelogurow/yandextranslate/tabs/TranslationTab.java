@@ -1,33 +1,44 @@
 package com.alexbelogurow.yandextranslate.tabs;
 
+import android.content.res.Configuration;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.ArrayMap;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alexbelogurow.yandextranslate.R;
 import com.alexbelogurow.yandextranslate.asyncTask.DictionaryTask;
 import com.alexbelogurow.yandextranslate.asyncTask.LanguageTask;
 import com.alexbelogurow.yandextranslate.asyncTask.TranslateTask;
+import com.alexbelogurow.yandextranslate.dataBase.DBHandler;
 import com.alexbelogurow.yandextranslate.helper.Dictionary;
+import com.alexbelogurow.yandextranslate.helper.Translate;
 
 import java.net.URLEncoder;
+
+import static android.content.ContentValues.TAG;
 
 
 /**
  * Created by alexbelogurow on 17.04.17.
  */
+// FIXME не работает крестик удаления
 
 public class TranslationTab extends Fragment {
 
@@ -47,11 +58,17 @@ public class TranslationTab extends Fragment {
     private TextView mTextViewLangFrom;
     private TextView mTextViewLangTo;
 
+    private ConstraintLayout mRootLayout;
+
     private String langFrom = "ru";
     private String langTo = "en";
 
     public static ArrayMap<String, String> languages = null;
     public static Dictionary dictOfTranslate = null;
+
+    public static DBHandler dbHandler;
+
+    private Translate translation;
 
     public TranslationTab() {
         // Required empty public constructor
@@ -61,7 +78,7 @@ public class TranslationTab extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_translation, container, false);
+        final View view = inflater.inflate(R.layout.fragment_translation, container, false);
 
         mEditTextInput = (EditText) view.findViewById(R.id.editTextInput);
         mTextViewTranslate = (TextView) view.findViewById(R.id.textViewTranslate);
@@ -70,6 +87,7 @@ public class TranslationTab extends Fragment {
         mTextViewDictionary = (TextView) view.findViewById(R.id.textViewDictionary);
         mTextViewLangFrom = (TextView) view.findViewById(R.id.textViewLangFrom);
         mTextViewLangTo = (TextView) view.findViewById(R.id.textViewLangTo);
+        mRootLayout = (ConstraintLayout) view.findViewById(R.id.layoutTranslationTab);
 
         return view;
     }
@@ -88,6 +106,9 @@ public class TranslationTab extends Fragment {
         }).execute("https://translate.yandex.net/api/v1.5/tr.json/getLangs?" +
                 "key=" + KEY_TRANSLATE +
                 "&ui=ru");
+
+        dbHandler = new DBHandler(getContext());
+        translation = new Translate("", "", "", "");
     }
 
 
@@ -114,6 +135,8 @@ public class TranslationTab extends Fragment {
             }
         });
         */
+
+
 
         mTextViewDictionary.setMovementMethod(new ScrollingMovementMethod());
         String s = "";
@@ -145,6 +168,55 @@ public class TranslationTab extends Fragment {
 
             }
         });
+
+        mEditTextInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+
+                Log.d("status", hasFocus + "");
+            }
+        });
+
+
+
+        mRootLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+
+                Rect r = new Rect();
+                mRootLayout.getWindowVisibleDisplayFrame(r);
+                int screenHeight = mRootLayout.getRootView().getHeight();
+
+                // r.bottom is the position above soft keypad or device button.
+                // if keypad is shown, the r.bottom is smaller than that before.
+                int keypadHeight = screenHeight - r.bottom;
+
+
+                if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
+                    Log.d("status", "not hidden");
+                }
+                else {
+                    // TODO или поменять на проверку в SQLITE
+                    Log.d("status", "hidden");
+                    if (mEditTextInput.getText().length() != 0 &&
+                            mEditTextInput.getText().toString() != translation.getText() &&
+                            mTextViewTranslate.getText().toString() != translation.getTranslatedText())
+                    {
+                        translation.setText(mEditTextInput.getText().toString());
+                        translation.setTranslatedText(mTextViewTranslate.getText().toString());
+                        translation.setFrom(mTextViewLangFrom.getText().toString());
+                        translation.setTo(mTextViewLangTo.getText().toString());
+
+                        dbHandler.addTranslation(translation);
+                    }
+                    //mEditTextInput.setFocusable(false);
+                }
+
+                //Log.d("count", dbHandler.getTranslationsCount() + "");
+            }
+        });
+
+        mTextViewDictionary.setText(dbHandler.getTranslate(20).toString());
 
     }
 
@@ -201,6 +273,9 @@ public class TranslationTab extends Fragment {
 
                     mTextViewDictionary.setText(output);
                     //Log.i("dictOfTranslate", dictOfTranslate.toString());
+
+
+
 
                 }
             }).execute("https://dictionary.yandex.net/api/v1/dicservice.json/lookup?" +
