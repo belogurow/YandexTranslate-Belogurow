@@ -1,4 +1,4 @@
-package com.alexbelogurow.yandextranslate.Helper;
+package com.alexbelogurow.yandextranslate.helper;
 
 /**
  * Created by alexbelogurow on 11.04.17.

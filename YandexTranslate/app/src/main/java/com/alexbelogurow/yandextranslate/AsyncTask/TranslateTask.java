@@ -1,4 +1,4 @@
-package com.alexbelogurow.yandextranslate.AsyncTask;
+package com.alexbelogurow.yandextranslate.asyncTask;
 
 import android.os.AsyncTask;
 import android.util.Log;

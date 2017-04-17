@@ -1,9 +1,8 @@
-package com.alexbelogurow.yandextranslate.AsyncTask;
+package com.alexbelogurow.yandextranslate.asyncTask;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
-import com.alexbelogurow.yandextranslate.Activity.MainActivity;
+import com.alexbelogurow.yandextranslate.activity.MainActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;

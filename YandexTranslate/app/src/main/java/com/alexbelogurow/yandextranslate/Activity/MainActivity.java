@@ -1,4 +1,4 @@
-package com.alexbelogurow.yandextranslate.Activity;
+package com.alexbelogurow.yandextranslate.activity;
 
 import android.content.Intent;
 import android.support.v4.util.ArrayMap;
@@ -7,18 +7,17 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.alexbelogurow.yandextranslate.AsyncTask.DictionaryTask;
-import com.alexbelogurow.yandextranslate.AsyncTask.LanguageTask;
-import com.alexbelogurow.yandextranslate.Helper.Dictionary;
+import com.alexbelogurow.yandextranslate.asyncTask.DictionaryTask;
+import com.alexbelogurow.yandextranslate.asyncTask.LanguageTask;
+import com.alexbelogurow.yandextranslate.helper.Dictionary;
 import com.alexbelogurow.yandextranslate.R;
-import com.alexbelogurow.yandextranslate.AsyncTask.TranslateTask;
+import com.alexbelogurow.yandextranslate.asyncTask.TranslateTask;
 
 import java.net.URLEncoder;
 
