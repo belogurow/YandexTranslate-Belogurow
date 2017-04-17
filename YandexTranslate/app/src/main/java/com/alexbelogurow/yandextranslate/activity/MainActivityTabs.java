@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.alexbelogurow.yandextranslate.R;
+import com.alexbelogurow.yandextranslate.tabs.HistoryTab;
 import com.alexbelogurow.yandextranslate.tabs.TranslationTab;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public class MainActivityTabs extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_tabs);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -43,9 +44,9 @@ public class MainActivityTabs extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new TranslationTab(), "ONE");
-        //adapter.addFragment(new TwoFragment(), "TWO");
-        //adapter.addFragment(new ThreeFragment(), "THREE");
+        adapter.addFragment(new TranslationTab(), "Translation");
+        adapter.addFragment(new HistoryTab(), "History");
+        adapter.addFragment(new TranslationTab(), "Translation");
         viewPager.setAdapter(adapter);
     }
 
