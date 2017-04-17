@@ -1,8 +1,6 @@
 package com.alexbelogurow.yandextranslate.tabs;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.ArrayMap;
@@ -19,8 +17,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.alexbelogurow.yandextranslate.R;
-import com.alexbelogurow.yandextranslate.activity.GetLanguageActivity;
-import com.alexbelogurow.yandextranslate.activity.MainActivity;
 import com.alexbelogurow.yandextranslate.asyncTask.DictionaryTask;
 import com.alexbelogurow.yandextranslate.asyncTask.LanguageTask;
 import com.alexbelogurow.yandextranslate.asyncTask.TranslateTask;
@@ -65,7 +61,7 @@ public class TranslationTab extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.activity_main, container, false);
+        View view = inflater.inflate(R.layout.fragment_translation, container, false);
 
         mEditTextInput = (EditText) view.findViewById(R.id.editTextInput);
         mTextViewTranslate = (TextView) view.findViewById(R.id.textViewTranslate);

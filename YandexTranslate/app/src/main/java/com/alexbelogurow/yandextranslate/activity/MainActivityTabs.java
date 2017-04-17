@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.alexbelogurow.yandextranslate.R;
+import com.alexbelogurow.yandextranslate.tabs.FavoriteTab;
 import com.alexbelogurow.yandextranslate.tabs.HistoryTab;
 import com.alexbelogurow.yandextranslate.tabs.TranslationTab;
 
@@ -47,7 +48,7 @@ public class MainActivityTabs extends AppCompatActivity {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new TranslationTab(), "Translation");
         adapter.addFragment(new HistoryTab(), "History");
-        adapter.addFragment(new TranslationTab(), "Translation");
+        adapter.addFragment(new FavoriteTab(), "Favorite");
         viewPager.setAdapter(adapter);
     }
 

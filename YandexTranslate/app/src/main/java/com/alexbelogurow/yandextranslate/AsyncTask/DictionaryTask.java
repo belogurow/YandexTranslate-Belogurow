@@ -61,7 +61,7 @@ public class DictionaryTask extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
 
-        Log.i("Dictionary", result);
+        //Log.i("Dictionary", result);
 
         // TODO добавить исключение: {"head":{},"def":[]} - добавлено
         // TODO можно проверять на наличие словаря в для данных языков в api
@@ -100,7 +100,7 @@ public class DictionaryTask extends AsyncTask<String, Void, String> {
                         JSONArray arrayOfExamples = item.getJSONArray("syn");
                         for (int i = 0; i < arrayOfExamples.length(); i++) {
                             JSONObject jsonObjectI = arrayOfExamples.getJSONObject(i);
-                            Log.i("array" + i, jsonObjectI.toString());
+                            //Log.i("array" + i, jsonObjectI.toString());
                             output += ", " + jsonObjectI.getString("text");
                         }
                     }
@@ -112,7 +112,7 @@ public class DictionaryTask extends AsyncTask<String, Void, String> {
                         JSONArray arrayOfDefinition = item.getJSONArray("mean");
                         for (int i = 0; i < arrayOfDefinition.length(); i++) {
                             JSONObject jsonObjectI = arrayOfDefinition.getJSONObject(i);
-                            Log.i("definition" + i, jsonObjectI.toString());
+                            //Log.i("definition" + i, jsonObjectI.toString());
                             output += " " + jsonObjectI.getString("text");
                         }
                         output += ")\n";
@@ -123,7 +123,7 @@ public class DictionaryTask extends AsyncTask<String, Void, String> {
                         JSONArray arrayOfExamples = item.getJSONArray("ex");
                         for (int i = 0; i < arrayOfExamples.length(); i++) {
                             JSONObject jsonObjectI = arrayOfExamples.getJSONObject(i);
-                            Log.i("example" + i, jsonObjectI.toString());
+                            //Log.i("example" + i, jsonObjectI.toString());
                             output += "\t\t" + jsonObjectI.getString("text");
 
                             // внутри надо вытащить перевод для примера
@@ -134,7 +134,7 @@ public class DictionaryTask extends AsyncTask<String, Void, String> {
                     }
 
                 }
-                Log.i("Output", output);
+                //Log.i("Output", output);
                 //Log.i("examples", examples.getString(0) + "\n" + examples.getString(1));
                 //Log.i("item", firstItem.getString("syn"));
                 //      text.getString("text") + " " + text.getString("pos") + " " + text.getString("gen"));
@@ -154,9 +154,3 @@ public class DictionaryTask extends AsyncTask<String, Void, String> {
         }
     }
 }
-
-/*
-JSONObject firstItem = new JSONObject(examples.getString(0));
-Log.i("item", firstItem.getString("syn"));
-[{"text":"machinery","pos":"существительное"},{"text":"apparatus","pos":"существительное"}]
- */
