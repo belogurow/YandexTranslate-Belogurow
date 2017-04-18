@@ -27,8 +27,8 @@ public class HistoryTabAdapter extends RecyclerView.Adapter<HistoryTabAdapter.Hi
         private CardView mCardView;
         private TextView mTextViewText,
                 mTextViewTrText,
-                mTextViewFromLang,
-                mTextViewToLang;
+                mTextViewFromToLang;
+                //mTextViewToLang;
 
 
         public HistoryViewHolder(View itemView) {
@@ -36,8 +36,8 @@ public class HistoryTabAdapter extends RecyclerView.Adapter<HistoryTabAdapter.Hi
             mCardView = (CardView) itemView.findViewById(R.id.cardViewHistory);
             mTextViewText = (TextView) itemView.findViewById(R.id.textViewHistoryText);
             mTextViewTrText = (TextView) itemView.findViewById(R.id.textViewHistoryTrText);
-            mTextViewFromLang = (TextView) itemView.findViewById(R.id.textViewHistoryFromLang);
-            mTextViewToLang = (TextView) itemView.findViewById(R.id.textViewHistoryToLang);
+            mTextViewFromToLang = (TextView) itemView.findViewById(R.id.textViewHistoryFromToLang);
+            //mTextViewToLang = (TextView) itemView.findViewById(R.id.textViewHistoryToLang);
         }
     }
     @Override
@@ -52,8 +52,11 @@ public class HistoryTabAdapter extends RecyclerView.Adapter<HistoryTabAdapter.Hi
     public void onBindViewHolder(HistoryTabAdapter.HistoryViewHolder holder, int position) {
         holder.mTextViewText.setText(translationList.get(position).getText());
         holder.mTextViewTrText.setText(translationList.get(position).getTranslatedText());
-        holder.mTextViewFromLang.setText(translationList.get(position).getFrom());
-        holder.mTextViewToLang.setText(translationList.get(position).getTo());
+        holder.mTextViewFromToLang.setText((
+                translationList.get(position).getFrom() + " - " +
+                translationList.get(position).getTo())
+                .toUpperCase());
+        //holder.mTextViewToLang.setText(translationList.get(position).getTo());
 
     }
 

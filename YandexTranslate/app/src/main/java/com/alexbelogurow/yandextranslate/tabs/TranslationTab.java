@@ -1,5 +1,6 @@
 package com.alexbelogurow.yandextranslate.tabs;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -16,6 +17,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -169,20 +172,24 @@ public class TranslationTab extends Fragment {
             }
         });
 
-        mEditTextInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
 
-                Log.d("status", hasFocus + "");
+        mEditTextInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(mEditTextInput.getWindowToken(), 0);
+                    return true;
+                }
+                return false;
+
             }
         });
-
 
 
         mRootLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-
                 Rect r = new Rect();
                 mRootLayout.getWindowVisibleDisplayFrame(r);
                 int screenHeight = mRootLayout.getRootView().getHeight();
@@ -196,8 +203,6 @@ public class TranslationTab extends Fragment {
                     Log.d("status", "not hidden");
                 }
                 else {
-                    // TODO или поменять на проверку в SQLITE
-                    Log.d("status", "hidden");
                     if (mEditTextInput.getText().length() != 0)
                     {
                         Translate translation = new Translate(
@@ -214,6 +219,8 @@ public class TranslationTab extends Fragment {
                 //Log.d("count", dbHandler.getTranslationsCount() + "");
             }
         });
+
+
 
 
     }

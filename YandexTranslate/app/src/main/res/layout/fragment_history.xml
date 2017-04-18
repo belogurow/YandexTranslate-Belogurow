@@ -10,8 +10,6 @@
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:id="@+id/recyclerViewHistory"
-        android:paddingStart="2dp"
-        android:paddingEnd="2dp"
         tools:layout_editor_absoluteY="8dp"
         tools:layout_editor_absoluteX="8dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
