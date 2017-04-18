@@ -6,24 +6,24 @@ package com.alexbelogurow.yandextranslate.helper;
 
 public class Translate {
 
-    Integer id, favorite;
+    Integer id, favourite;
     String from, to, text, translatedText;
 
-    public Translate(Integer id, String text, String translatedText, String from, String to, Integer favorite) {
+    public Translate(Integer id, String text, String translatedText, String from, String to, Integer favourite) {
         this.id = id;
         this.from = from;
         this.to = to;
         this.text = text;
         this.translatedText = translatedText;
-        this.favorite = favorite;
+        this.favourite = favourite;
     }
 
-    public Translate(String text, String translatedText, String from, String to, Integer favorite) {
+    public Translate(String text, String translatedText, String from, String to, Integer favourite) {
         this.from = from;
         this.to = to;
         this.text = text;
         this.translatedText = translatedText;
-        this.favorite = favorite;
+        this.favourite = favourite;
     }
 
     public Translate(String text, String translatedText, String from, String to) {
@@ -31,7 +31,7 @@ public class Translate {
         this.to = to;
         this.text = text;
         this.translatedText = translatedText;
-        this.favorite = 0;
+        this.favourite = 0;
     }
 
     public Integer getId() {
@@ -74,19 +74,19 @@ public class Translate {
         this.translatedText = translatedText;
     }
 
-    public Integer getFavorite() {
-        return favorite;
+    public Integer getFavourite() {
+        return favourite;
     }
 
-    public void setFavorite(Integer favorite) {
-        this.favorite = favorite;
+    public void setFavourite(Integer favourite) {
+        this.favourite = favourite;
     }
 
     @Override
     public String toString() {
         return "Translate{" +
                 "id=" + id +
-                ", favorite=" + favorite +
+                ", favourite=" + favourite +
                 ", from='" + from + '\'' +
                 ", to='" + to + '\'' +
                 ", text='" + text + '\'' +

@@ -198,14 +198,13 @@ public class TranslationTab extends Fragment {
                 else {
                     // TODO или поменять на проверку в SQLITE
                     Log.d("status", "hidden");
-                    if (mEditTextInput.getText().length() != 0 &&
-                            mEditTextInput.getText().toString() != translation.getText() &&
-                            mTextViewTranslate.getText().toString() != translation.getTranslatedText())
+                    if (mEditTextInput.getText().length() != 0)
                     {
-                        translation.setText(mEditTextInput.getText().toString());
-                        translation.setTranslatedText(mTextViewTranslate.getText().toString());
-                        translation.setFrom(langFrom);
-                        translation.setTo(langTo);
+                        Translate translation = new Translate(
+                                mEditTextInput.getText().toString(),
+                                mTextViewTranslate.getText().toString(),
+                                langFrom,
+                                langTo);
 
                         dbHandler.addTranslation(translation);
                     }
@@ -216,7 +215,6 @@ public class TranslationTab extends Fragment {
             }
         });
 
-        mTextViewDictionary.setText(dbHandler.getTranslate(20).toString());
 
     }
 
