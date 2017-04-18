@@ -166,7 +166,9 @@ public class TranslationTab extends Fragment {
                 mButtonDeleteInputText.setVisibility(Button.VISIBLE);
 
                 // метод getTranslate для получения перевода и словаря
-                getTranslate(s.toString());
+                if (s.toString().length() != 0) {
+                    getTranslate(s.toString());
+                }
 
 
             }
@@ -176,12 +178,12 @@ public class TranslationTab extends Fragment {
         mEditTextInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                //if (actionId == EditorInfo.IME_ACTION_DONE) {
                     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(mEditTextInput.getWindowToken(), 0);
                     return true;
-                }
-                return false;
+                //}
+                //return false;
 
             }
         });
@@ -209,7 +211,7 @@ public class TranslationTab extends Fragment {
                                 mEditTextInput.getText().toString(),
                                 mTextViewTranslate.getText().toString(),
                                 langFrom,
-                                langTo);
+                                langTo, 0);
 
                         dbHandler.addTranslation(translation);
                     }

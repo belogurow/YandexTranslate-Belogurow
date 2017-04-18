@@ -2,6 +2,7 @@ package com.alexbelogurow.yandextranslate.tabs;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,10 +24,11 @@ import java.util.List;
 
 public class HistoryTab extends Fragment {
     private DBHandler db;
-    private RecyclerView recyclerView;
+    private RecyclerView mRecyclerView;
+    public static CoordinatorLayout mCoordLayout;
     private HistoryTabAdapter adapter;
 
-    public static List<Translate> translationList;
+    private List<Translate> translationList;
 
     public HistoryTab() {
         // Required empty public constructor
@@ -46,7 +48,8 @@ public class HistoryTab extends Fragment {
         final View view = inflater.inflate(R.layout.fragment_history, container, false);
         // Inflate the layout for this fragment
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewHistory);
+        mCoordLayout = (CoordinatorLayout) view.findViewById(R.id.coordLayoutHistory);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewHistory);
 
         return view;
     }
@@ -58,17 +61,17 @@ public class HistoryTab extends Fragment {
 
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+        mRecyclerView.setHasFixedSize(true);
 
         //initializeData();
         initializeAdapter();
     }
 
     private void initializeAdapter() {
-        translationList = db.getAllTranslations();
-        adapter = new HistoryTabAdapter(translationList);
-        recyclerView.setAdapter(adapter);
+        translationList = db.getAllTranslations(false);
+        adapter = new HistoryTabAdapter(translationList, getContext());
+        mRecyclerView.setAdapter(adapter);
         //adapter.setHasStableIds(true);
     }
 
@@ -78,9 +81,12 @@ public class HistoryTab extends Fragment {
 
         if (isVisibleToUser) {
             Log.i("visible", "true");
-            initializeAdapter();
-            //recyclerView.setAdapter(adapter);
+            //initializeAdapter();
+            //translationList = db.getAllTranslations(false);
+            //mRecyclerView.setAdapter(adapter);
             //adapter.notifyDataSetChanged();
+            adapter.updateList(false);
+
         }
     }
 }

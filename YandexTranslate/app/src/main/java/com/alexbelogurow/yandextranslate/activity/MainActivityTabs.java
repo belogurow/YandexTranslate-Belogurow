@@ -49,7 +49,7 @@ public class MainActivityTabs extends AppCompatActivity {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new TranslationTab(), "Translation");
         adapter.addFragment(new HistoryTab(), "History");
-        adapter.addFragment(new FavoriteTab(), "Favorite");
+        adapter.addFragment(new FavoriteTab(), "Favourite");
         viewPager.setAdapter(adapter);
     }
 

@@ -69,7 +69,8 @@ public class DBHandler extends SQLiteOpenHelper {
     public void addTranslation(Translate translate) {
         String SELECT_TRANSLATE = "SELECT * FROM " + TABLE_TRANSLATION +
                 " WHERE " + KEY_TEXT + " ='" + translate.getText() +
-                "' AND " + KEY_TR_TEXT + " ='" + translate.getTranslatedText() + "'";
+                "' AND " + KEY_FROM + " ='" + translate.getFrom() + "'" +
+                " AND " + KEY_TO + " ='" + translate.getTo() + "'";
 
 
 
@@ -149,12 +150,17 @@ public class DBHandler extends SQLiteOpenHelper {
         return translate;
     }
 
-    public List<Translate> getAllTranslations() {
+    public List<Translate> getAllTranslations(boolean fav) {
 
         List<Translate> translationsList = new ArrayList<>();
         // Select All Query
-        String selectQuery = "SELECT * FROM " + TABLE_TRANSLATION;
-
+        String selectQuery;
+        if (fav) {
+            selectQuery = "SELECT * FROM " + TABLE_TRANSLATION +
+                    " WHERE " + KEY_FAVOURITE + " = '1'";
+        } else {
+            selectQuery = "SELECT * FROM " + TABLE_TRANSLATION;
+        }
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
