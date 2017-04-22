@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.alexbelogurow.yandextranslate.model.Translate;
+import com.alexbelogurow.yandextranslate.model.Translation;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -66,11 +66,11 @@ public class DBHandler extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void addTranslation(Translate translate) {
+    public void addTranslation(Translation translation) {
         String SELECT_TRANSLATE = "SELECT * FROM " + TABLE_TRANSLATION +
-                " WHERE " + KEY_TEXT + " ='" + translate.getText() +
-                "' AND " + KEY_FROM + " ='" + translate.getFrom() + "'" +
-                " AND " + KEY_TO + " ='" + translate.getTo() + "'";
+                " WHERE " + KEY_TEXT + " ='" + translation.getText() +
+                "' AND " + KEY_FROM + " ='" + translation.getFrom() + "'" +
+                " AND " + KEY_TO + " ='" + translation.getTo() + "'";
 
 
 
@@ -96,11 +96,11 @@ public class DBHandler extends SQLiteOpenHelper {
 
 
         ContentValues values = new ContentValues();
-        values.put(KEY_TEXT, translate.getText());
-        values.put(KEY_TR_TEXT, translate.getTranslatedText());
-        values.put(KEY_FROM, translate.getFrom());
-        values.put(KEY_TO, translate.getTo());
-        values.put(KEY_FAVOURITE, translate.getFavourite());
+        values.put(KEY_TEXT, translation.getText());
+        values.put(KEY_TR_TEXT, translation.getTranslatedText());
+        values.put(KEY_FROM, translation.getFrom());
+        values.put(KEY_TO, translation.getTo());
+        values.put(KEY_FAVOURITE, translation.getFavourite());
 
         //Log.d(Log.DEBUG + "", "insert");
         db1.insert(TABLE_TRANSLATION, null, values);
@@ -111,11 +111,11 @@ public class DBHandler extends SQLiteOpenHelper {
         /*SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_TEXT, translate.getText());
-        values.put(KEY_TR_TEXT, translate.getTranslatedText());
-        values.put(KEY_FROM, translate.getFrom());
-        values.put(KEY_TO, translate.getTo());
-        values.put(KEY_FAVOURITE, translate.getFavourite());
+        values.put(KEY_TEXT, translation.getText());
+        values.put(KEY_TR_TEXT, translation.getTranslatedText());
+        values.put(KEY_FROM, translation.getFrom());
+        values.put(KEY_TO, translation.getTo());
+        values.put(KEY_FAVOURITE, translation.getFavourite());
 
         //db.insertWithOnConflict(TABLE_TRANSLATION, null, values, SQLiteDatabase.CONFLICT_REPLACE);
         db.insert(TABLE_TRANSLATION, null, values);
@@ -124,7 +124,7 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
 
-    public Translate getTranslate(int id) {
+    public Translation getTranslate(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         Cursor cursor = db.query(TABLE_TRANSLATION, new String[] {
@@ -139,7 +139,7 @@ public class DBHandler extends SQLiteOpenHelper {
         if (cursor != null)
             cursor.moveToFirst();
 
-        Translate translate = new Translate(
+        Translation translation = new Translation(
                 Integer.parseInt(cursor.getString(0)),
                 cursor.getString(1),
                 cursor.getString(2),
@@ -147,17 +147,17 @@ public class DBHandler extends SQLiteOpenHelper {
                 cursor.getString(4),
                 Integer.parseInt(cursor.getString(5)));
 
-        return translate;
+        return translation;
     }
 
-    public Translate getLastTranslation() {
+    public Translation getLastTranslation() {
         SQLiteDatabase db = this.getWritableDatabase();
 
         String selectQuery = "SELECT * FROM " + TABLE_TRANSLATION;
         Cursor cursor = db.rawQuery(selectQuery, null);
         cursor.moveToLast();
 
-        Translate translation = new Translate(
+        Translation translation = new Translation(
                 Integer.parseInt(cursor.getString(0)),
                 cursor.getString(1),
                 cursor.getString(2),
@@ -171,9 +171,9 @@ public class DBHandler extends SQLiteOpenHelper {
         return translation;
     }
 
-    public List<Translate> getAllTranslations(boolean fav) {
+    public List<Translation> getAllTranslations(boolean fav) {
 
-        List<Translate> translationsList = new ArrayList<>();
+        List<Translation> translationsList = new ArrayList<>();
         // Select All Query
         String selectQuery;
         if (fav) {
@@ -188,7 +188,7 @@ public class DBHandler extends SQLiteOpenHelper {
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
-                Translate translate = new Translate(
+                Translation translation = new Translation(
                         Integer.parseInt(cursor.getString(0)),
                         cursor.getString(1),
                         cursor.getString(2),
@@ -196,7 +196,7 @@ public class DBHandler extends SQLiteOpenHelper {
                         cursor.getString(4),
                         Integer.parseInt(cursor.getString(5)));
                 // Adding contact to list
-                translationsList.add(translate);
+                translationsList.add(translation);
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -209,10 +209,10 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     // Deleting single contact
-    public void deleteTranslation(Translate translate) {
+    public void deleteTranslation(Translation translation) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_TRANSLATION, KEY_ID + " = ?",
-                new String[] { String.valueOf(translate.getId()) });
+                new String[] { String.valueOf(translation.getId()) });
         db.close();
     }
 

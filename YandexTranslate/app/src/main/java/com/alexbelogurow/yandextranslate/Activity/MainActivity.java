@@ -88,14 +88,6 @@ public class MainActivity extends AppCompatActivity {
 
         mTextViewDictionary.setText(s);
         // FIXME вылетает при нажатии кнопки назад
-        new LanguageTask(new LanguageTask.DownloadResponse() {
-            @Override
-            public void processLangsFinish(ArrayMap<String, String> output) {
-                languages = output;
-            }
-        }).execute("https://translate.yandex.net/api/v1.5/tr.json/getLangs?" +
-                "key=" + KEY_TRANSLATE +
-                "&ui=ru");
 
 
         // addTextChangedListener отслеживает изменение текста в mEditTextView,

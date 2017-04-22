@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import com.alexbelogurow.yandextranslate.R;
 import com.alexbelogurow.yandextranslate.dataBase.DBHandler;
-import com.alexbelogurow.yandextranslate.model.Translate;
+import com.alexbelogurow.yandextranslate.model.Translation;
 
 import java.util.List;
 
@@ -21,11 +21,11 @@ import java.util.List;
  */
 
 public class HistoryTabAdapter extends RecyclerView.Adapter<HistoryTabAdapter.HistoryViewHolder> {
-    private List<Translate> translationList;
+    private List<Translation> translationList;
     private Context context;
 
 
-    public HistoryTabAdapter(List<Translate> translationList, Context context) {
+    public HistoryTabAdapter(List<Translation> translationList, Context context) {
         this.translationList = translationList;
         this.context = context;
 
@@ -103,7 +103,7 @@ public class HistoryTabAdapter extends RecyclerView.Adapter<HistoryTabAdapter.Hi
 
                     DBHandler dbHandler = new DBHandler(context);
 
-                    Translate translation = translationList.get(position);
+                    Translation translation = translationList.get(position);
                     translation.setFavourite(1);
 
                     dbHandler.addTranslation(translation);
@@ -118,7 +118,7 @@ public class HistoryTabAdapter extends RecyclerView.Adapter<HistoryTabAdapter.Hi
 
                     DBHandler dbHandler = new DBHandler(context);
 
-                    Translate translation = translationList.get(position);
+                    Translation translation = translationList.get(position);
                     translation.setFavourite(0);
 
                     dbHandler.addTranslation(translation);

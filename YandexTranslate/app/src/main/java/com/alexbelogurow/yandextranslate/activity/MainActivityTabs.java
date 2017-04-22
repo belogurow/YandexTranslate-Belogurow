@@ -6,15 +6,18 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.util.ArrayMap;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 
 import com.alexbelogurow.yandextranslate.R;
+import com.alexbelogurow.yandextranslate.asyncTask.LanguageTask;
 import com.alexbelogurow.yandextranslate.tabs.FavoriteTab;
 import com.alexbelogurow.yandextranslate.tabs.HistoryTab;
 import com.alexbelogurow.yandextranslate.tabs.TranslationTab;
+import com.alexbelogurow.yandextranslate.utils.Constant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,13 +39,22 @@ public class MainActivityTabs extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+        new LanguageTask(new LanguageTask.DownloadResponse() {
+            @Override
+            public void processLangsFinish(ArrayMap<String, String> output) {
+                TranslationTab.languages = output;
+            }
+        }).execute("https://translate.yandex.net/api/v1.5/tr.json/getLangs?" +
+                "key=" + Constant.KEY_TRANSLATE +
+                "&ui=ru");
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -82,5 +94,8 @@ public class MainActivityTabs extends AppCompatActivity {
         }
     }
 
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 }

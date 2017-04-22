@@ -18,7 +18,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.GetLanguageActivity" />
+
+        <activity android:name=".activity.GetLanguageActivity"
+            android:label="@string/lang_of_text" />
     </application>
 
 </manifest>

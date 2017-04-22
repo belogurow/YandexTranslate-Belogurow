@@ -1,6 +1,7 @@
 package com.alexbelogurow.yandextranslate.tabs;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -24,15 +25,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alexbelogurow.yandextranslate.R;
+import com.alexbelogurow.yandextranslate.activity.GetLanguageActivity;
 import com.alexbelogurow.yandextranslate.asyncTask.DictionaryTask;
 import com.alexbelogurow.yandextranslate.asyncTask.LanguageTask;
 import com.alexbelogurow.yandextranslate.asyncTask.TranslateTask;
 import com.alexbelogurow.yandextranslate.dataBase.DBHandler;
 import com.alexbelogurow.yandextranslate.model.Dictionary;
-import com.alexbelogurow.yandextranslate.model.Translate;
+import com.alexbelogurow.yandextranslate.model.Translation;
+import com.alexbelogurow.yandextranslate.utils.Constant;
 
 import java.net.URLEncoder;
 import java.util.Objects;
+
+import static android.app.Activity.RESULT_OK;
+import static com.alexbelogurow.yandextranslate.utils.Constant.KEY_TRANSLATE;
 
 
 /**
@@ -41,10 +47,6 @@ import java.util.Objects;
 // FIXME не работает крестик удаления
 
 public class TranslationTab extends Fragment {
-
-    private static final String
-            KEY_TRANSLATE = "trnsl.1.1.20170314T185242Z.999b1fe140aa0411.51001ae9e89efdf73f40ad571ba71b214cc62f02",
-            KEY_DICTIONARY = "dict.1.1.20170314T202833Z.600119660f570864.0875e9d92a265c752e3c59235b85f83e29a01a1e";
 
     private final int REQUEST_CODE_LANG_FROM = 1,
             REQUEST_CODE_LANG_TO = 2;
@@ -60,15 +62,15 @@ public class TranslationTab extends Fragment {
 
     private ConstraintLayout mRootLayout;
 
-    private String langFrom = "ru";
-    private String langTo = "en";
+    public static String langFrom = "ru";
+    public static String langTo = "en";
 
     public static ArrayMap<String, String> languages = null;
     public static Dictionary dictOfTranslate = null;
 
     public static DBHandler dbHandler;
 
-    private Translate currentTranslation;
+    private Translation currentTranslation;
 
     public TranslationTab() {
     }
@@ -88,6 +90,8 @@ public class TranslationTab extends Fragment {
         mImageButtonTrFavourite = (ImageButton) view.findViewById(R.id.imageButtonTrFavourite);
         mRootLayout = (ConstraintLayout) view.findViewById(R.id.layoutTranslationTab);
 
+
+
         return view;
     }
 
@@ -101,13 +105,16 @@ public class TranslationTab extends Fragment {
             @Override
             public void processLangsFinish(ArrayMap<String, String> output) {
                 languages = output;
+                Log.i("langs", languages.toString());
             }
         }).execute("https://translate.yandex.net/api/v1.5/tr.json/getLangs?" +
-                "key=" + KEY_TRANSLATE +
+                "key=" + Constant.KEY_TRANSLATE +
                 "&ui=ru");
 
+
+
         dbHandler = new DBHandler(getContext());
-        currentTranslation = new Translate("", "", langFrom, langTo);
+        currentTranslation = new Translation("", "", langFrom, langTo);
 
         Log.d(Log.DEBUG + "", "onCreate");
     }
@@ -118,24 +125,26 @@ public class TranslationTab extends Fragment {
         super.onActivityCreated(savedInstanceState);
         Log.d(Log.DEBUG + "", "onActivityCreated");
         Log.i("langs", languages.toString());
-        /*
+
+
         mTextViewLangFrom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent getLanguage = new Intent(getActivity(), GetLanguageActivity.class);
-                startActivityForResult(getLanguage, REQUEST_CODE_LANG_FROM);
+                startActivity(getLanguage);
+                //startActivityForResult(getLanguage, REQUEST_CODE_LANG_FROM);
             }
         });
-
 
         mTextViewLangTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent getLanguage = new Intent(getActivity(), GetLanguageActivity.class);
-                startActivityForResult(getLanguage, REQUEST_CODE_LANG_TO);
+                //startActivity(getLanguage);
+                TranslationTab.this.startActivityForResult(getLanguage, REQUEST_CODE_LANG_TO);
             }
         });
-        */
+
 
         mTextViewDictionary.setMovementMethod(new ScrollingMovementMethod());
 
@@ -222,7 +231,7 @@ public class TranslationTab extends Fragment {
                 else {
                     if (currentTranslation.getText().length() != 0 && TranslationTab.this.isVisible()) {
                         if (dbHandler.getTranslationsCount() > 0) {
-                            Translate lastTranslationFromDB = dbHandler.getLastTranslation();
+                            Translation lastTranslationFromDB = dbHandler.getLastTranslation();
                             if (!Objects.equals(currentTranslation.getText(), lastTranslationFromDB.getText()) &&
                                     !Objects.equals(currentTranslation.getTranslatedText(), lastTranslationFromDB.getTranslatedText())) {
                                 dbHandler.addTranslation(currentTranslation);
@@ -235,11 +244,11 @@ public class TranslationTab extends Fragment {
                     /*
                     if (mEditTextInput.getText().length() != 0 && TranslationTab.this.isVisible()) {
                         if (dbHandler.getTranslationsCount() > 0) {
-                            Translate lastTranslation = dbHandler.getLastTranslation();
+                            Translation lastTranslation = dbHandler.getLastTranslation();
                             if (!Objects.equals(lastTranslation.getText(), mEditTextInput.getText().toString()) &&
                                     !Objects.equals(lastTranslation.getTranslatedText(), mTextViewTranslate.getText().toString())) {
 
-                                Translate translation = new Translate(
+                                Translation translation = new Translation(
                                         mEditTextInput.getText().toString(),
                                         mTextViewTranslate.getText().toString(),
                                         langFrom,
@@ -247,7 +256,7 @@ public class TranslationTab extends Fragment {
                                 dbHandler.addTranslation(translation);
                             }
                         } else {
-                            Translate translation = new Translate(
+                            Translation translation = new Translation(
                                     mEditTextInput.getText().toString(),
                                     mTextViewTranslate.getText().toString(),
                                     langFrom,
@@ -274,6 +283,28 @@ public class TranslationTab extends Fragment {
         view.setVisibility(View.INVISIBLE);
     }
 
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        int number = data.getIntExtra("numberOfKey", -1);
+
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_CODE_LANG_FROM:
+                    mTextViewLangFrom.setText(languages.valueAt(number));
+                    langFrom = languages.keyAt(number);
+                case REQUEST_CODE_LANG_TO:
+                    mTextViewLangTo.setText(languages.valueAt(number));
+                    langTo = languages.keyAt(number);
+            }
+        }
+
+        if (mEditTextInput.getText().length() != 0) {
+            getTranslate(mEditTextInput.getText().toString());
+        }
+    }
+
     /*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -293,8 +324,8 @@ public class TranslationTab extends Fragment {
         }
 
         mEditTextInput.setText(mEditTextInput.getText());
-    }
-    */
+    } */
+
 
     private void getTranslate(String s) {
         try {
@@ -329,7 +360,7 @@ public class TranslationTab extends Fragment {
 
                 }
             }).execute("https://dictionary.yandex.net/api/v1/dicservice.json/lookup?" +
-                    "key=" + KEY_DICTIONARY +
+                    "key=" + Constant.KEY_DICTIONARY +
                     "&text=" + text +
                     "&lang=" + langFrom + "-" + langTo +
                     "&ui=ru");

@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import com.alexbelogurow.yandextranslate.R;
 import com.alexbelogurow.yandextranslate.adapter.HistoryTabAdapter;
 import com.alexbelogurow.yandextranslate.dataBase.DBHandler;
-import com.alexbelogurow.yandextranslate.model.Translate;
+import com.alexbelogurow.yandextranslate.model.Translation;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class FavoriteTab extends Fragment {
     private FloatingActionButton mFabUpdate;
     private FloatingActionButton mFabDelete;
 
-    public static List<Translate> favTranslationList;
+    public static List<Translation> favTranslationList;
 
     public FavoriteTab() {
         // Required empty public constructor

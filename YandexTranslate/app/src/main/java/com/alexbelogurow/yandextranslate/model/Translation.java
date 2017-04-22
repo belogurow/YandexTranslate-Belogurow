@@ -4,12 +4,12 @@ package com.alexbelogurow.yandextranslate.model;
  * Created by alexbelogurow on 17.04.17.
  */
 
-public class Translate {
+public class Translation {
 
     Integer id, favourite;
     String from, to, text, translatedText;
 
-    public Translate(Integer id, String text, String translatedText, String from, String to, Integer favourite) {
+    public Translation(Integer id, String text, String translatedText, String from, String to, Integer favourite) {
         this.id = id;
         this.from = from;
         this.to = to;
@@ -18,7 +18,7 @@ public class Translate {
         this.favourite = favourite;
     }
 
-    public Translate(String text, String translatedText, String from, String to, Integer favourite) {
+    public Translation(String text, String translatedText, String from, String to, Integer favourite) {
         this.from = from;
         this.to = to;
         this.text = text;
@@ -26,7 +26,7 @@ public class Translate {
         this.favourite = favourite;
     }
 
-    public Translate(String text, String translatedText, String from, String to) {
+    public Translation(String text, String translatedText, String from, String to) {
         this.from = from;
         this.to = to;
         this.text = text;
@@ -88,7 +88,7 @@ public class Translate {
 
     @Override
     public String toString() {
-        return "Translate{" +
+        return "Translation{" +
                 "id=" + id +
                 ", favourite=" + favourite +
                 ", from='" + from + '\'' +

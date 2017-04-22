@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import com.alexbelogurow.yandextranslate.R;
 import com.alexbelogurow.yandextranslate.adapter.HistoryTabAdapter;
 import com.alexbelogurow.yandextranslate.dataBase.DBHandler;
-import com.alexbelogurow.yandextranslate.model.Translate;
+import com.alexbelogurow.yandextranslate.model.Translation;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class HistoryTab extends Fragment {
     private FloatingActionButton mFabUpdate;
     private FloatingActionButton mFabDelete;
 
-    private List<Translate> translationList;
+    private List<Translation> translationList;
 
     public HistoryTab() {
         // Required empty public constructor
