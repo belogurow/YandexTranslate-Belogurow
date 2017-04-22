@@ -2,7 +2,7 @@ package com.alexbelogurow.yandextranslate.tabs;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import com.alexbelogurow.yandextranslate.R;
 import com.alexbelogurow.yandextranslate.adapter.HistoryTabAdapter;
 import com.alexbelogurow.yandextranslate.dataBase.DBHandler;
-import com.alexbelogurow.yandextranslate.helper.Translate;
+import com.alexbelogurow.yandextranslate.model.Translate;
 
 import java.util.List;
 
@@ -25,8 +25,10 @@ import java.util.List;
 public class HistoryTab extends Fragment {
     private DBHandler db;
     private RecyclerView mRecyclerView;
-    public static CoordinatorLayout mCoordLayout;
     private HistoryTabAdapter adapter;
+
+    private FloatingActionButton mFabUpdate;
+    private FloatingActionButton mFabDelete;
 
     private List<Translate> translationList;
 
@@ -48,8 +50,9 @@ public class HistoryTab extends Fragment {
         final View view = inflater.inflate(R.layout.fragment_history, container, false);
         // Inflate the layout for this fragment
 
-        mCoordLayout = (CoordinatorLayout) view.findViewById(R.id.coordLayoutHistory);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewHistory);
+        mFabUpdate = (FloatingActionButton) view.findViewById(R.id.historyFabUpdate);
+        mFabDelete = (FloatingActionButton) view.findViewById(R.id.historyFabDelete);
 
         return view;
     }
@@ -63,6 +66,42 @@ public class HistoryTab extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.setHasFixedSize(true);
+
+        mFabUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                adapter.updateList(false);
+            }
+        });
+
+        mFabDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db.deleteAllTranslations();
+                adapter.updateList(true);
+            }
+        });
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (dy > 0) {
+                    // Scroll Down
+                    if (mFabUpdate.isShown()) {
+                        mFabUpdate.hide();
+                        mFabDelete.hide();
+                    }
+                } else if (dy < 0) {
+                    // Scroll Up
+                    if (!mFabUpdate.isShown()) {
+                        mFabUpdate.show();
+                        mFabDelete.show();
+                    }
+                }
+            }
+        });
 
         //initializeData();
         initializeAdapter();
@@ -89,4 +128,6 @@ public class HistoryTab extends Fragment {
 
         }
     }
+
+
 }

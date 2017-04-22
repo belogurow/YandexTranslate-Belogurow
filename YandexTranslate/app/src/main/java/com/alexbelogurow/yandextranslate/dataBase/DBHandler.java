@@ -5,9 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
-import com.alexbelogurow.yandextranslate.helper.Translate;
+import com.alexbelogurow.yandextranslate.model.Translate;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +16,7 @@ import java.util.List;
  * Created by alexbelogurow on 17.04.17.
  */
 
+// TODO добавить метод для удаления только избранного
 public class DBHandler extends SQLiteOpenHelper {
 
     // Database Version
@@ -81,7 +81,7 @@ public class DBHandler extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             id = cursor.getString(cursor.getColumnIndex(KEY_ID));
         }
-        Log.d(Log.DEBUG + "", count + "");
+        //Log.d(Log.DEBUG + "-add", count + "");
 
 
         cursor.close();
@@ -91,7 +91,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
         if (count != 0) {
             db1.delete(TABLE_TRANSLATION, KEY_ID + "=?", new String[] { id });
-            Log.d(Log.DEBUG + "", "delete");
+            //Log.d(Log.DEBUG + "", "delete");
         }
 
 
@@ -102,7 +102,7 @@ public class DBHandler extends SQLiteOpenHelper {
         values.put(KEY_TO, translate.getTo());
         values.put(KEY_FAVOURITE, translate.getFavourite());
 
-        Log.d(Log.DEBUG + "", "insert");
+        //Log.d(Log.DEBUG + "", "insert");
         db1.insert(TABLE_TRANSLATION, null, values);
 
 
@@ -150,6 +150,27 @@ public class DBHandler extends SQLiteOpenHelper {
         return translate;
     }
 
+    public Translate getLastTranslation() {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String selectQuery = "SELECT * FROM " + TABLE_TRANSLATION;
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        cursor.moveToLast();
+
+        Translate translation = new Translate(
+                Integer.parseInt(cursor.getString(0)),
+                cursor.getString(1),
+                cursor.getString(2),
+                cursor.getString(3),
+                cursor.getString(4),
+                Integer.parseInt(cursor.getString(5)));
+
+        cursor.close();
+        db.close();
+
+        return translation;
+    }
+
     public List<Translate> getAllTranslations(boolean fav) {
 
         List<Translate> translationsList = new ArrayList<>();
@@ -192,6 +213,13 @@ public class DBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_TRANSLATION, KEY_ID + " = ?",
                 new String[] { String.valueOf(translate.getId()) });
+        db.close();
+    }
+
+    public void deleteAllTranslations() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.delete(TABLE_TRANSLATION, null, null);
+
         db.close();
     }
 

@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.alexbelogurow.yandextranslate.asyncTask.DictionaryTask;
 import com.alexbelogurow.yandextranslate.asyncTask.LanguageTask;
-import com.alexbelogurow.yandextranslate.helper.Dictionary;
+import com.alexbelogurow.yandextranslate.model.Dictionary;
 import com.alexbelogurow.yandextranslate.R;
 import com.alexbelogurow.yandextranslate.asyncTask.TranslateTask;
 
@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
 
         mEditTextInput = (EditText) findViewById(R.id.editTextInput);
         mTextViewTranslate = (TextView) findViewById(R.id.textViewTranslate);
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mButtonDeleteInputText = (Button) findViewById(R.id.buttonDeleteInputText);
         mTextViewDictionary = (TextView) findViewById(R.id.textViewDictionary);
 

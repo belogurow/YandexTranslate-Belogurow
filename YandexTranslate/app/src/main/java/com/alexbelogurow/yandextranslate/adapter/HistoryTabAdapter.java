@@ -1,7 +1,6 @@
 package com.alexbelogurow.yandextranslate.adapter;
 
 import android.content.Context;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,8 +12,7 @@ import android.widget.Toast;
 
 import com.alexbelogurow.yandextranslate.R;
 import com.alexbelogurow.yandextranslate.dataBase.DBHandler;
-import com.alexbelogurow.yandextranslate.helper.Translate;
-import com.alexbelogurow.yandextranslate.tabs.HistoryTab;
+import com.alexbelogurow.yandextranslate.model.Translate;
 
 import java.util.List;
 

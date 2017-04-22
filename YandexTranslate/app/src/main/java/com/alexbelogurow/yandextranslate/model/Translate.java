@@ -1,4 +1,4 @@
-package com.alexbelogurow.yandextranslate.helper;
+package com.alexbelogurow.yandextranslate.model;
 
 /**
  * Created by alexbelogurow on 17.04.17.
@@ -80,6 +80,10 @@ public class Translate {
 
     public void setFavourite(Integer favourite) {
         this.favourite = favourite;
+    }
+
+    public boolean isFavourite() {
+        return favourite == 1;
     }
 
     @Override

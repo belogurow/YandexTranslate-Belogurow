@@ -1,7 +1,6 @@
 package com.alexbelogurow.yandextranslate.tabs;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,11 +16,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,12 +28,11 @@ import com.alexbelogurow.yandextranslate.asyncTask.DictionaryTask;
 import com.alexbelogurow.yandextranslate.asyncTask.LanguageTask;
 import com.alexbelogurow.yandextranslate.asyncTask.TranslateTask;
 import com.alexbelogurow.yandextranslate.dataBase.DBHandler;
-import com.alexbelogurow.yandextranslate.helper.Dictionary;
-import com.alexbelogurow.yandextranslate.helper.Translate;
+import com.alexbelogurow.yandextranslate.model.Dictionary;
+import com.alexbelogurow.yandextranslate.model.Translate;
 
 import java.net.URLEncoder;
-
-import static android.content.ContentValues.TAG;
+import java.util.Objects;
 
 
 /**
@@ -55,8 +52,8 @@ public class TranslationTab extends Fragment {
     private EditText mEditTextInput;
     private TextView mTextViewTranslate;
     private TextView mTextViewDictionary;
-    private ProgressBar mProgressBar;
     private Button mButtonDeleteInputText;
+    private ImageButton mImageButtonTrFavourite;
 
     private TextView mTextViewLangFrom;
     private TextView mTextViewLangTo;
@@ -71,10 +68,9 @@ public class TranslationTab extends Fragment {
 
     public static DBHandler dbHandler;
 
-    private Translate translation;
+    private Translate currentTranslation;
 
     public TranslationTab() {
-        // Required empty public constructor
     }
 
     @Override
@@ -85,11 +81,11 @@ public class TranslationTab extends Fragment {
 
         mEditTextInput = (EditText) view.findViewById(R.id.editTextInput);
         mTextViewTranslate = (TextView) view.findViewById(R.id.textViewTranslate);
-        mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         mButtonDeleteInputText = (Button) view.findViewById(R.id.buttonDeleteInputText);
         mTextViewDictionary = (TextView) view.findViewById(R.id.textViewDictionary);
         mTextViewLangFrom = (TextView) view.findViewById(R.id.textViewLangFrom);
         mTextViewLangTo = (TextView) view.findViewById(R.id.textViewLangTo);
+        mImageButtonTrFavourite = (ImageButton) view.findViewById(R.id.imageButtonTrFavourite);
         mRootLayout = (ConstraintLayout) view.findViewById(R.id.layoutTranslationTab);
 
         return view;
@@ -111,14 +107,16 @@ public class TranslationTab extends Fragment {
                 "&ui=ru");
 
         dbHandler = new DBHandler(getContext());
-        translation = new Translate("", "", "", "");
+        currentTranslation = new Translate("", "", langFrom, langTo);
+
+        Log.d(Log.DEBUG + "", "onCreate");
     }
 
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+        Log.d(Log.DEBUG + "", "onActivityCreated");
         Log.i("langs", languages.toString());
         /*
         mTextViewLangFrom.setOnClickListener(new View.OnClickListener() {
@@ -139,17 +137,7 @@ public class TranslationTab extends Fragment {
         });
         */
 
-
-
         mTextViewDictionary.setMovementMethod(new ScrollingMovementMethod());
-        String s = "";
-        for (int i = 0; i < 200; i++) {
-            s += "textviewTEST ";
-        }
-
-        mTextViewDictionary.setText(s);
-
-
 
         // addTextChangedListener отслеживает изменение текста в mEditTextView,
         // и если он произошел, отправляет запрос на получение json с переводом
@@ -162,12 +150,16 @@ public class TranslationTab extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                mProgressBar.setVisibility(ProgressBar.VISIBLE);
                 mButtonDeleteInputText.setVisibility(Button.VISIBLE);
+
+                mImageButtonTrFavourite.setImageResource(R.drawable.ic_fav_off);
+                currentTranslation.setFavourite(0);
 
                 // метод getTranslate для получения перевода и словаря
                 if (s.toString().length() != 0) {
                     getTranslate(s.toString());
+
+
                 }
 
 
@@ -179,12 +171,35 @@ public class TranslationTab extends Fragment {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 //if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(mEditTextInput.getWindowToken(), 0);
-                    return true;
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(mEditTextInput.getWindowToken(), 0);
+                Log.d(Log.DEBUG + "", event + "");
+                return true;
                 //}
                 //return false;
 
+            }
+        });
+
+
+        // кнопка добавления в избранное
+        mImageButtonTrFavourite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentTranslation.getText().length() != 0 && TranslationTab.this.isVisible()) {
+                    if (currentTranslation.isFavourite()) {
+                        currentTranslation.setFavourite(0);
+                        mImageButtonTrFavourite.setImageResource(R.drawable.ic_fav_off);
+
+                        dbHandler.addTranslation(currentTranslation);
+                    } else {
+                        currentTranslation.setFavourite(1);
+                        mImageButtonTrFavourite.setImageResource(R.drawable.ic_fav_on);
+
+                        Toast.makeText(getContext(), "Added in favourite", Toast.LENGTH_SHORT).show();
+                        dbHandler.addTranslation(currentTranslation);
+                    }
+                }
             }
         });
 
@@ -205,20 +220,46 @@ public class TranslationTab extends Fragment {
                     Log.d("status", "not hidden");
                 }
                 else {
-                    if (mEditTextInput.getText().length() != 0)
-                    {
-                        Translate translation = new Translate(
-                                mEditTextInput.getText().toString(),
-                                mTextViewTranslate.getText().toString(),
-                                langFrom,
-                                langTo, 0);
+                    if (currentTranslation.getText().length() != 0 && TranslationTab.this.isVisible()) {
+                        if (dbHandler.getTranslationsCount() > 0) {
+                            Translate lastTranslationFromDB = dbHandler.getLastTranslation();
+                            if (!Objects.equals(currentTranslation.getText(), lastTranslationFromDB.getText()) &&
+                                    !Objects.equals(currentTranslation.getTranslatedText(), lastTranslationFromDB.getTranslatedText())) {
+                                dbHandler.addTranslation(currentTranslation);
+                            }
+                        } else {
+                            dbHandler.addTranslation(currentTranslation);
+                        }
+                    }
+                }
+                    /*
+                    if (mEditTextInput.getText().length() != 0 && TranslationTab.this.isVisible()) {
+                        if (dbHandler.getTranslationsCount() > 0) {
+                            Translate lastTranslation = dbHandler.getLastTranslation();
+                            if (!Objects.equals(lastTranslation.getText(), mEditTextInput.getText().toString()) &&
+                                    !Objects.equals(lastTranslation.getTranslatedText(), mTextViewTranslate.getText().toString())) {
 
-                        dbHandler.addTranslation(translation);
+                                Translate translation = new Translate(
+                                        mEditTextInput.getText().toString(),
+                                        mTextViewTranslate.getText().toString(),
+                                        langFrom,
+                                        langTo, 0);
+                                dbHandler.addTranslation(translation);
+                            }
+                        } else {
+                            Translate translation = new Translate(
+                                    mEditTextInput.getText().toString(),
+                                    mTextViewTranslate.getText().toString(),
+                                    langFrom,
+                                    langTo, 0);
+                            dbHandler.addTranslation(translation);
+                        }
+
                     }
                     //mEditTextInput.setFocusable(false);
                 }
 
-                //Log.d("count", dbHandler.getTranslationsCount() + "");
+                //Log.d("count", dbHandler.getTranslationsCount() + ""); */
             }
         });
 
@@ -264,7 +305,11 @@ public class TranslationTab extends Fragment {
                 public void processTranslateFinish(String output) {
 
                     mTextViewTranslate.setText(output);
-                    mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+
+                    currentTranslation.setText(mEditTextInput.getText().toString());
+                    currentTranslation.setTranslatedText(mTextViewTranslate.getText().toString());
+                    currentTranslation.setFrom(langFrom);
+                    currentTranslation.setTo(langTo);
 
                 }
             }).execute("https://translate.yandex.net/api/v1.5/tr.json/translate?" +
@@ -280,8 +325,6 @@ public class TranslationTab extends Fragment {
 
                     mTextViewDictionary.setText(output);
                     //Log.i("dictOfTranslate", dictOfTranslate.toString());
-
-
 
 
                 }
