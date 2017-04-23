@@ -2,10 +2,6 @@ package com.alexbelogurow.yandextranslate.asyncTask;
 
 import android.os.AsyncTask;
 import android.support.v4.util.ArrayMap;
-import android.util.Log;
-
-import com.alexbelogurow.yandextranslate.activity.MainActivity;
-import com.alexbelogurow.yandextranslate.tabs.TranslationTab;
 
 import org.json.JSONException;
 import org.json.JSONObject;

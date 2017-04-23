@@ -1,5 +1,6 @@
 package com.alexbelogurow.yandextranslate.tabs;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 
 import com.alexbelogurow.yandextranslate.R;
 import com.alexbelogurow.yandextranslate.adapter.HistoryTabAdapter;
@@ -56,6 +58,7 @@ public class HistoryTab extends Fragment {
         mFabUpdate = (FloatingActionButton) view.findViewById(R.id.historyFabUpdate);
         mFabDelete = (FloatingActionButton) view.findViewById(R.id.historyFabDelete);
 
+        hideKeyboard();
         return view;
     }
 
@@ -150,6 +153,14 @@ public class HistoryTab extends Fragment {
                 });
 
         builder.create().show();
+    }
+
+    private void hideKeyboard() {
+        View view = getActivity().getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
 }

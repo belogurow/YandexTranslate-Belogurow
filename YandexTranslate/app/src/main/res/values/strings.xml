@@ -2,7 +2,10 @@
     <string name="app_name">YandexTranslate</string>
 
     <string name="auto_lang">Определять язык</string>
+    <string name="label_info">Информация</string>
+
     <string name="lang_of_text">Язык текста</string>
+    <string name="lang_of_trtext">Язык перевода</string>
 
     <string name="ru">Русский</string>
     <string name="en">Английский</string>
@@ -16,4 +19,16 @@
 
     <string name="cancel">Отмена</string>
     <string name="yes">Да</string>
+
+    <string name="info_tr">Приложение использует сервисы</string>
+    <string name="link_translate">
+        <a href="https://translate.yandex.ru/">"Яндекс.Переводчик"</a>
+    </string>
+    <string name="link_dictionary">
+        <a href="https://tech.yandex.ru/dictionary/">"Яндекс.Словарь"</a>
+    </string>
+
+  <string name="check_internet">Отсутствует подключение к интернету</string>
+
+
 </resources>

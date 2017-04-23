@@ -12,6 +12,7 @@ public class Translation implements Serializable{
     String from, to, text, translatedText;
 
     public Translation() {
+        this.favourite = 0;
     }
 
     public Translation(Integer id, String text, String translatedText, String from, String to, Integer favourite) {

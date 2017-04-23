@@ -1,5 +1,6 @@
 package com.alexbelogurow.yandextranslate.tabs;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,12 +13,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 
 import com.alexbelogurow.yandextranslate.R;
 import com.alexbelogurow.yandextranslate.adapter.HistoryTabAdapter;
 import com.alexbelogurow.yandextranslate.dataBase.DBHandler;
 import com.alexbelogurow.yandextranslate.model.Translation;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -32,7 +35,7 @@ public class FavoriteTab extends Fragment {
     private FloatingActionButton mFabUpdate;
     private FloatingActionButton mFabDelete;
 
-    public static List<Translation> favTranslationList;
+    private List<Translation> favTranslationList;
 
     public FavoriteTab() {
         // Required empty public constructor
@@ -43,6 +46,8 @@ public class FavoriteTab extends Fragment {
         super.onCreate(savedInstanceState);
 
         db = new DBHandler(getContext());
+
+
     }
 
     @Override
@@ -55,6 +60,7 @@ public class FavoriteTab extends Fragment {
         mFabUpdate = (FloatingActionButton) view.findViewById(R.id.historyFabUpdate);
         mFabDelete = (FloatingActionButton) view.findViewById(R.id.historyFabDelete);
 
+        hideKeyboard();
         return view;
     }
 
@@ -133,6 +139,7 @@ public class FavoriteTab extends Fragment {
     }
 
     private void initializeAdapter() {
+
         favTranslationList = db.getAllTranslations(true);
         adapter = new HistoryTabAdapter(favTranslationList, getContext());
         recyclerView.setAdapter(adapter);
@@ -144,12 +151,23 @@ public class FavoriteTab extends Fragment {
         super.setUserVisibleHint(isVisibleToUser);
 
         if (isVisibleToUser) {
-            Log.i("visible", "true");
-            initializeAdapter();
+            Log.i("adapter", (adapter == null) + "");
+            //initializeAdapter();
             //recyclerView.setAdapter(adapter);
             //adapter.notifyDataSetChanged();
+
+            if (adapter != null) {
+                adapter.updateList(true);
+            }
         }
     }
 
+    private void hideKeyboard() {
+        View view = getActivity().getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
 
 }

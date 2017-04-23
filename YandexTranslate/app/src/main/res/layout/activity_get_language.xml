@@ -8,7 +8,7 @@
 
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbarGetLangs"
+        android:id="@+id/toolbarInfo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
@@ -33,7 +33,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbarGetLangs" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbarInfo" />
 
     <ListView
         android:id="@+id/listViewLanguages"
@@ -43,7 +43,6 @@
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
         android:choiceMode="singleChoice"
-        android:listSelector="@android:color/darker_gray"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

@@ -12,7 +12,6 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import com.alexbelogurow.yandextranslate.R;
-import com.alexbelogurow.yandextranslate.model.Translation;
 import com.alexbelogurow.yandextranslate.tabs.TranslationTab;
 
 import java.util.ArrayList;
@@ -23,44 +22,63 @@ public class GetLanguageActivity extends AppCompatActivity {
     private Toolbar mToolBar;
     private Switch mSwitchAutoLang;
 
+    private int code;
+    private String label;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_get_language);
 
         mListViewLanguages = (ListView) findViewById(R.id.listViewLanguages);
-        mToolBar = (Toolbar) findViewById(R.id.toolbarGetLangs);
+        mToolBar = (Toolbar) findViewById(R.id.toolbarInfo);
         mSwitchAutoLang = (Switch) findViewById(R.id.switchAutoLang);
 
-        if (TranslationTab.isAutoLang) {
-            mSwitchAutoLang.setChecked(true);
+        code = getIntent().getIntExtra("CODE", -1);
+
+        if (code == 2) {
+            mSwitchAutoLang.setVisibility(View.INVISIBLE);
+
+            label = getResources().getString(R.string.lang_of_trtext);
+        } else {
+            if (TranslationTab.isAutoLang) {
+                mSwitchAutoLang.setChecked(true);
+            }
+
+            label = getResources().getString(R.string.lang_of_text);
         }
 
         if (mToolBar != null) {
             setSupportActionBar(mToolBar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setTitle(label);
         }
 
         mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainMenu = new Intent();
+                Intent mainMenu1 = new Intent();
 
-                mainMenu.putExtra("isAutoLang", mSwitchAutoLang.isChecked());
-                setResult(RESULT_OK, mainMenu);
+                /*
+                if (mSwitchAutoLang.isChecked()) {
+                    //Toast.makeText(getApplicationContext(), "checked", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), mSwitchAutoLang.isChecked() + "", Toast.LENGTH_SHORT).show();
+                    mainMenu.putExtra("isAutoLang", true);
+                    setResult(RESULT_OK, mainMenu);
+                } else {
+                    setResult(RESULT_CANCELED, mainMenu);
+                } */
                 //setResult(RESULT_CANCELED, mainMenu);
-                onBackPressed();
+                mainMenu1.putExtra("isAutoLang", mSwitchAutoLang.isChecked());
+                //Toast.makeText(getApplicationContext(), getIntent().getIntExtra("CODE", -1), Toast.LENGTH_SHORT).show();
+                //mainMenu.putExtra("code", getIntent().getIntExtra("CODE", -1));
+                setResult(RESULT_OK, mainMenu1);
+                //onBackPressed();
                 finish();
             }
         });
 
-
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-
-        //mListViewLanguages.setSelector(R.color.selected);
-        //mListViewLanguages.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
 
         ArrayList<String> listOfLangs = new ArrayList<>();
 
@@ -79,9 +97,10 @@ public class GetLanguageActivity extends AppCompatActivity {
                 Intent mainMenu = new Intent();
                 mainMenu.putExtra("numberOfKey", position);
                 mainMenu.putExtra("isAutoLang", mSwitchAutoLang.isChecked());
+                mainMenu.putExtra("code", code);
                 setResult(RESULT_OK, mainMenu);
 
-                onBackPressed();
+                //onBackPressed();
                 finish();
 
             }

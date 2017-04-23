@@ -9,4 +9,5 @@
 
     <color name="Backgorund_ButtonDeleteInputText">#00f7f7f7</color>
     <color name="selected">#F0F0F0</color>
+    <color name="link">#767418</color>
 </resources>
