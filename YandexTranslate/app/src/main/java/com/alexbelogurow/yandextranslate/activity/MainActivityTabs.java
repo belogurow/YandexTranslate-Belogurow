@@ -2,6 +2,7 @@ package com.alexbelogurow.yandextranslate.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -10,10 +11,12 @@ import android.support.v4.util.ArrayMap;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 
 import com.alexbelogurow.yandextranslate.R;
 import com.alexbelogurow.yandextranslate.asyncTask.LanguageTask;
+import com.alexbelogurow.yandextranslate.model.Translation;
 import com.alexbelogurow.yandextranslate.tabs.FavoriteTab;
 import com.alexbelogurow.yandextranslate.tabs.HistoryTab;
 import com.alexbelogurow.yandextranslate.tabs.TranslationTab;
@@ -31,9 +34,12 @@ public class MainActivityTabs extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_main_tabs);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -47,21 +53,14 @@ public class MainActivityTabs extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-        new LanguageTask(new LanguageTask.DownloadResponse() {
-            @Override
-            public void processLangsFinish(ArrayMap<String, String> output) {
-                TranslationTab.languages = output;
-            }
-        }).execute("https://translate.yandex.net/api/v1.5/tr.json/getLangs?" +
-                "key=" + Constant.KEY_TRANSLATE +
-                "&ui=ru");
+
     }
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new TranslationTab(), "Translation");
-        adapter.addFragment(new HistoryTab(), "History");
-        adapter.addFragment(new FavoriteTab(), "Favourite");
+        adapter.addFragment(new TranslationTab(), this.getResources().getString(R.string.translator));
+        adapter.addFragment(new HistoryTab(), this.getResources().getString(R.string.history));
+        adapter.addFragment(new FavoriteTab(), this.getResources().getString(R.string.favourite));
         viewPager.setAdapter(adapter);
     }
 

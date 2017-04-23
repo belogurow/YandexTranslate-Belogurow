@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.alexbelogurow.yandextranslate.model.Translation;
 
@@ -103,6 +104,7 @@ public class DBHandler extends SQLiteOpenHelper {
         values.put(KEY_FAVOURITE, translation.getFavourite());
 
         //Log.d(Log.DEBUG + "", "insert");
+        Log.d(Log.DEBUG + "-add", translation.toString());
         db1.insert(TABLE_TRANSLATION, null, values);
 
 
@@ -213,6 +215,13 @@ public class DBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_TRANSLATION, KEY_ID + " = ?",
                 new String[] { String.valueOf(translation.getId()) });
+        db.close();
+    }
+
+    public void deleteFavTranslations() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_TRANSLATION, KEY_FAVOURITE + " = ?",
+                new String[] { String.valueOf(1) });
         db.close();
     }
 

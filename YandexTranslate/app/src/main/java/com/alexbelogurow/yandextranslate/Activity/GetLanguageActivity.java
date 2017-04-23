@@ -32,7 +32,9 @@ public class GetLanguageActivity extends AppCompatActivity {
         mToolBar = (Toolbar) findViewById(R.id.toolbarGetLangs);
         mSwitchAutoLang = (Switch) findViewById(R.id.switchAutoLang);
 
-
+        if (TranslationTab.isAutoLang) {
+            mSwitchAutoLang.setChecked(true);
+        }
 
         if (mToolBar != null) {
             setSupportActionBar(mToolBar);
@@ -43,6 +45,11 @@ public class GetLanguageActivity extends AppCompatActivity {
         mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent mainMenu = new Intent();
+
+                mainMenu.putExtra("isAutoLang", mSwitchAutoLang.isChecked());
+                setResult(RESULT_OK, mainMenu);
+                //setResult(RESULT_CANCELED, mainMenu);
                 onBackPressed();
                 finish();
             }
@@ -69,15 +76,9 @@ public class GetLanguageActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                String key = TranslationTab.languages.keyAt(position);
-                Toast.makeText(getApplicationContext(), key, Toast.LENGTH_LONG).show();
-
-                //TranslationTab.langTo = TranslationTab.languages.keyAt(position);
-
-                //arrayAdapter.notifyDataSetChanged();
-
                 Intent mainMenu = new Intent();
                 mainMenu.putExtra("numberOfKey", position);
+                mainMenu.putExtra("isAutoLang", mSwitchAutoLang.isChecked());
                 setResult(RESULT_OK, mainMenu);
 
                 onBackPressed();

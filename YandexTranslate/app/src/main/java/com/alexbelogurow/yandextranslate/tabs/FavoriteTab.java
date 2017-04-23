@@ -1,9 +1,11 @@
 package com.alexbelogurow.yandextranslate.tabs;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -76,8 +78,10 @@ public class FavoriteTab extends Fragment {
         mFabDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                db.deleteAllTranslations();
-                adapter.updateList(true);
+                showAlertDialog();
+
+                //db.deleteFavTranslations();
+                //adapter.updateList(true);
             }
         });
 
@@ -104,6 +108,28 @@ public class FavoriteTab extends Fragment {
 
         //initializeData();
         initializeAdapter();
+    }
+
+    private void showAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.favourite)
+                .setMessage(R.string.alert_del_favourite)
+                .setCancelable(true)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        db.deleteFavTranslations();
+                        adapter.updateList(true);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+        builder.create().show();
     }
 
     private void initializeAdapter() {

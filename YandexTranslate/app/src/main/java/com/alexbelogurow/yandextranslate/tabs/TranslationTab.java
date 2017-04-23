@@ -2,9 +2,9 @@ package com.alexbelogurow.yandextranslate.tabs;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.ArrayMap;
@@ -62,8 +62,9 @@ public class TranslationTab extends Fragment {
 
     private ConstraintLayout mRootLayout;
 
-    public static String langFrom = "ru";
-    public static String langTo = "en";
+    public static boolean isAutoLang = false;
+    private String langFrom;
+    private String langTo;
 
     public static ArrayMap<String, String> languages = null;
     public static Dictionary dictOfTranslate = null;
@@ -90,7 +91,7 @@ public class TranslationTab extends Fragment {
         mImageButtonTrFavourite = (ImageButton) view.findViewById(R.id.imageButtonTrFavourite);
         mRootLayout = (ConstraintLayout) view.findViewById(R.id.layoutTranslationTab);
 
-
+        loadState();
 
         return view;
     }
@@ -100,12 +101,12 @@ public class TranslationTab extends Fragment {
         super.onCreate(savedInstanceState);
 
         languages = new ArrayMap<>();
-        // FIXME вылетает при нажатии кнопки назад
         new LanguageTask(new LanguageTask.DownloadResponse() {
             @Override
             public void processLangsFinish(ArrayMap<String, String> output) {
                 languages = output;
                 Log.i("langs", languages.toString());
+
             }
         }).execute("https://translate.yandex.net/api/v1.5/tr.json/getLangs?" +
                 "key=" + Constant.KEY_TRANSLATE +
@@ -114,25 +115,25 @@ public class TranslationTab extends Fragment {
 
 
         dbHandler = new DBHandler(getContext());
-        currentTranslation = new Translation("", "", langFrom, langTo);
+        currentTranslation = new Translation();
 
-        Log.d(Log.DEBUG + "", "onCreate");
     }
 
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(Log.DEBUG + "", "onActivityCreated");
-        Log.i("langs", languages.toString());
-
 
         mTextViewLangFrom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent getLanguage = new Intent(getActivity(), GetLanguageActivity.class);
-                startActivity(getLanguage);
+                //startActivity(getLanguage);
                 //startActivityForResult(getLanguage, REQUEST_CODE_LANG_FROM);
+                //getActivity().startActivityForResult(getLanguage, REQUEST_CODE_LANG_FROM);
+
+
+                TranslationTab.this.startActivityForResult(getLanguage, REQUEST_CODE_LANG_FROM);
             }
         });
 
@@ -159,16 +160,17 @@ public class TranslationTab extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                mButtonDeleteInputText.setVisibility(Button.VISIBLE);
-
                 mImageButtonTrFavourite.setImageResource(R.drawable.ic_fav_off);
                 currentTranslation.setFavourite(0);
 
                 // метод getTranslate для получения перевода и словаря
                 if (s.toString().length() != 0) {
                     getTranslate(s.toString());
-
-
+                    mButtonDeleteInputText.setVisibility(Button.VISIBLE);
+                }
+                else {
+                    mTextViewTranslate.setText("");
+                    mButtonDeleteInputText.setVisibility(Button.INVISIBLE);
                 }
 
 
@@ -216,65 +218,27 @@ public class TranslationTab extends Fragment {
         mRootLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                Rect r = new Rect();
-                mRootLayout.getWindowVisibleDisplayFrame(r);
-                int screenHeight = mRootLayout.getRootView().getHeight();
-
-                // r.bottom is the position above soft keypad or device button.
-                // if keypad is shown, the r.bottom is smaller than that before.
-                int keypadHeight = screenHeight - r.bottom;
-
-
-                if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
-                    Log.d("status", "not hidden");
+                if (keyboardIsHidden()) {
+                    addTranslationToDB();
                 }
-                else {
-                    if (currentTranslation.getText().length() != 0 && TranslationTab.this.isVisible()) {
-                        if (dbHandler.getTranslationsCount() > 0) {
-                            Translation lastTranslationFromDB = dbHandler.getLastTranslation();
-                            if (!Objects.equals(currentTranslation.getText(), lastTranslationFromDB.getText()) &&
-                                    !Objects.equals(currentTranslation.getTranslatedText(), lastTranslationFromDB.getTranslatedText())) {
-                                dbHandler.addTranslation(currentTranslation);
-                            }
-                        } else {
-                            dbHandler.addTranslation(currentTranslation);
-                        }
-                    }
-                }
-                    /*
-                    if (mEditTextInput.getText().length() != 0 && TranslationTab.this.isVisible()) {
-                        if (dbHandler.getTranslationsCount() > 0) {
-                            Translation lastTranslation = dbHandler.getLastTranslation();
-                            if (!Objects.equals(lastTranslation.getText(), mEditTextInput.getText().toString()) &&
-                                    !Objects.equals(lastTranslation.getTranslatedText(), mTextViewTranslate.getText().toString())) {
-
-                                Translation translation = new Translation(
-                                        mEditTextInput.getText().toString(),
-                                        mTextViewTranslate.getText().toString(),
-                                        langFrom,
-                                        langTo, 0);
-                                dbHandler.addTranslation(translation);
-                            }
-                        } else {
-                            Translation translation = new Translation(
-                                    mEditTextInput.getText().toString(),
-                                    mTextViewTranslate.getText().toString(),
-                                    langFrom,
-                                    langTo, 0);
-                            dbHandler.addTranslation(translation);
-                        }
-
-                    }
-                    //mEditTextInput.setFocusable(false);
-                }
-
-                //Log.d("count", dbHandler.getTranslationsCount() + ""); */
             }
         });
 
 
 
 
+    }
+
+    private boolean keyboardIsHidden() {
+        Rect r = new Rect();
+        mRootLayout.getWindowVisibleDisplayFrame(r);
+        int screenHeight = mRootLayout.getRootView().getHeight();
+
+        // r.bottom is the position above soft keypad or device button.
+        // if keypad is shown, the r.bottom is smaller than that before.
+        int keypadHeight = screenHeight - r.bottom;
+
+        return keypadHeight <= screenHeight * 0.15;
     }
 
     // очистить поле ввода после нажатия на крестик "x"
@@ -286,23 +250,36 @@ public class TranslationTab extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        int number = data.getIntExtra("numberOfKey", -1);
+        //super.onActivityResult(requestCode, resultCode, data);
+        Log.d(Log.DEBUG + "code", requestCode + "");
 
         if (resultCode == RESULT_OK) {
+            int number = data.getIntExtra("numberOfKey", -1);
+            isAutoLang = data.getBooleanExtra("isAutoLang", false);
+
             switch (requestCode) {
                 case REQUEST_CODE_LANG_FROM:
-                    mTextViewLangFrom.setText(languages.valueAt(number));
-                    langFrom = languages.keyAt(number);
+                    Log.d(Log.DEBUG + "aresult", number + ", " + isAutoLang);
+                    if (!isAutoLang) {
+                        mTextViewLangFrom.setText(languages.valueAt(number));
+                        langFrom = languages.keyAt(number);
+                    } else {
+                        if (number != -1) {
+                            mTextViewLangFrom.setText(languages.valueAt(number));
+                            langFrom = languages.keyAt(number);
+                        }
+                    }
                 case REQUEST_CODE_LANG_TO:
-                    mTextViewLangTo.setText(languages.valueAt(number));
-                    langTo = languages.keyAt(number);
+                    if (number != -1) {
+                        mTextViewLangTo.setText(languages.valueAt(number));
+                        langTo = languages.keyAt(number);
+                    }
+            }
+            if (mEditTextInput.getText().length() != 0) {
+                getTranslate(mEditTextInput.getText().toString());
             }
         }
-
-        if (mEditTextInput.getText().length() != 0) {
-            getTranslate(mEditTextInput.getText().toString());
-        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     /*
@@ -331,6 +308,12 @@ public class TranslationTab extends Fragment {
         try {
             String text = URLEncoder.encode(s, "UTF-8");
 
+            String urlLangs;
+            if (isAutoLang) {
+                urlLangs = langTo;
+            } else {
+                urlLangs = langFrom + "-" + langTo;
+            }
             new TranslateTask(new TranslateTask.DownloadResponse() {
                 @Override
                 public void processTranslateFinish(String output) {
@@ -342,11 +325,16 @@ public class TranslationTab extends Fragment {
                     currentTranslation.setFrom(langFrom);
                     currentTranslation.setTo(langTo);
 
+                    //
+                    if (keyboardIsHidden()) {
+                        addTranslationToDB();
+                    }
+
                 }
             }).execute("https://translate.yandex.net/api/v1.5/tr.json/translate?" +
                     "key=" + KEY_TRANSLATE +
                     "&text=" + text +
-                    "&lang=" + langFrom + "-" + langTo);
+                    "&lang=" + urlLangs);
 
 
             // TODO добавить проверку на наличие языка
@@ -362,12 +350,77 @@ public class TranslationTab extends Fragment {
             }).execute("https://dictionary.yandex.net/api/v1/dicservice.json/lookup?" +
                     "key=" + Constant.KEY_DICTIONARY +
                     "&text=" + text +
-                    "&lang=" + langFrom + "-" + langTo +
+                    "&lang=" + urlLangs +
                     "&ui=ru");
 
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void addTranslationToDB() {
+        Log.d(Log.DEBUG + "-current", currentTranslation.toString());
+        if (currentTranslation.getText().length() != 0 && TranslationTab.this.isVisible()) {
+            if (dbHandler.getTranslationsCount() > 0) {
+                Translation lastTranslationFromDB = dbHandler.getLastTranslation();
+                Log.d(Log.DEBUG + "-last", lastTranslationFromDB.toString());
+                if (!Objects.equals(currentTranslation.getText(), lastTranslationFromDB.getText()) ||
+                        !Objects.equals(currentTranslation.getFrom(), lastTranslationFromDB.getFrom()) ||
+                        !Objects.equals(currentTranslation.getTo(), lastTranslationFromDB.getTo())) {
+                    dbHandler.addTranslation(currentTranslation);
+                }
+            } else {
+                dbHandler.addTranslation(currentTranslation);
+            }
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        saveState();
+    }
+
+    private void saveState() {
+        SharedPreferences statePref = this.getActivity().
+                getSharedPreferences("lastTranslation", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = statePref.edit();
+        editor.clear();
+        editor.putString("text", currentTranslation.getText());
+        editor.putString("trText", currentTranslation.getTranslatedText());
+        editor.putString("langFrom", langFrom);
+        editor.putString("langTo", langTo);
+
+        //editor.put
+
+        editor.apply();
+    }
+
+    private void loadState() {
+        SharedPreferences statePref = this.getActivity().
+                getSharedPreferences("lastTranslation", Context.MODE_PRIVATE);
+
+        currentTranslation.setText(statePref.getString("text", ""));
+        currentTranslation.setTranslatedText(statePref.getString("trText", ""));
+        currentTranslation.setFrom(statePref.getString("langFrom", "ru"));
+        currentTranslation.setTo(statePref.getString("langTo", "en"));
+
+        mEditTextInput.setText(currentTranslation.getText());
+        mTextViewTranslate.setText(currentTranslation.getTranslatedText());
+        /*mTextViewLangFrom.setText(languages.valueAt(
+                languages.indexOfKey(currentTranslation.getFrom())));
+        mTextViewLangTo.setText(languages.valueAt(
+                languages.indexOfKey(currentTranslation.getTo())));
+        */
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putSerializable("currentTranslation", currentTranslation);
+        Log.i("statePref", "save");
     }
 }

@@ -69,6 +69,7 @@ public class DictionaryTask extends AsyncTask<String, Void, String> {
         try {
             JSONObject jsonObject = new JSONObject(result);
 
+            Log.i("JSON-dict", jsonObject.toString());
             String output = "";
 
             if (jsonObject.getJSONArray("def").length() == 0) {
@@ -151,6 +152,7 @@ public class DictionaryTask extends AsyncTask<String, Void, String> {
 
         } catch (JSONException e) {
             e.printStackTrace();
+            delegate.processDictionaryFinish("");
         }
     }
 }

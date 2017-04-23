@@ -1,9 +1,11 @@
 package com.alexbelogurow.yandextranslate.tabs;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -77,8 +79,7 @@ public class HistoryTab extends Fragment {
         mFabDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                db.deleteAllTranslations();
-                adapter.updateList(true);
+                showAlertDialog();
             }
         });
 
@@ -129,5 +130,26 @@ public class HistoryTab extends Fragment {
         }
     }
 
+    private void showAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.history)
+                .setMessage(R.string.alert_del_history)
+                .setCancelable(true)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        db.deleteAllTranslations();
+                        adapter.updateList(false);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+        builder.create().show();
+    }
 
 }

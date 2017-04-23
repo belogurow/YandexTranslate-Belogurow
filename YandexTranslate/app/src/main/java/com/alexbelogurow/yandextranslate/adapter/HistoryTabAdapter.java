@@ -1,18 +1,22 @@
 package com.alexbelogurow.yandextranslate.adapter;
 
+import android.app.TabActivity;
 import android.content.Context;
+import android.support.design.widget.TabLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alexbelogurow.yandextranslate.R;
 import com.alexbelogurow.yandextranslate.dataBase.DBHandler;
 import com.alexbelogurow.yandextranslate.model.Translation;
+import com.alexbelogurow.yandextranslate.tabs.TranslationTab;
 
 import java.util.List;
 
@@ -48,7 +52,6 @@ public class HistoryTabAdapter extends RecyclerView.Adapter<HistoryTabAdapter.Hi
             mTextViewFromToLang = (TextView) itemView.findViewById(R.id.textViewHistoryFromToLang);
             mImageButtonFav = (ImageButton) itemView.findViewById(R.id.imageButtonTabsFavorite);
 
-            //mImageButtonFav.setOnClickListener(this);
         }
 
         /*@Override
@@ -129,8 +132,6 @@ public class HistoryTabAdapter extends RecyclerView.Adapter<HistoryTabAdapter.Hi
                 }
             }
         });
-        //holder.mTextViewToLang.setText(favTranslationList.get(position).getTo());
-
     }
 
 

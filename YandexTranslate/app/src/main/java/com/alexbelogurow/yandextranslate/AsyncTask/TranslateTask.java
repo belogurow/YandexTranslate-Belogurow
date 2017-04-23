@@ -30,6 +30,7 @@ public class TranslateTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... urls) {
+        Log.d(Log.DEBUG + "-URL", urls[0]);
         String result = "";
         URL url;
         HttpURLConnection urlConnection;

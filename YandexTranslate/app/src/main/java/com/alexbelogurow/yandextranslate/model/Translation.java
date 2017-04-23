@@ -1,13 +1,18 @@
 package com.alexbelogurow.yandextranslate.model;
 
+import java.io.Serializable;
+
 /**
  * Created by alexbelogurow on 17.04.17.
  */
 
-public class Translation {
+public class Translation implements Serializable{
 
     Integer id, favourite;
     String from, to, text, translatedText;
+
+    public Translation() {
+    }
 
     public Translation(Integer id, String text, String translatedText, String from, String to, Integer favourite) {
         this.id = id;
