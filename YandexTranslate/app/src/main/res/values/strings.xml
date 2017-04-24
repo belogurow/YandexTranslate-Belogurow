@@ -30,6 +30,7 @@
 
     <string name="check_internet">Отсутствует подключение к интернету</string>
     <string name="add_in_fav">Добавлено в избранное, обновите список</string>
+    <string name="add_in_fav2">Добавлено в избранное</string>
     <string name="remove_from_fav">Убрано из избранного, обновите список</string>
 
 

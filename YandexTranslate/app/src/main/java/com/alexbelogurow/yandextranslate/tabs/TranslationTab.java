@@ -254,6 +254,18 @@ public class TranslationTab extends Fragment {
         });
 
         /**
+         * При открытии другого окна прятать клавиатуру
+         */
+        mEditTextInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    hideKeyboard();
+                }
+            }
+        });
+
+        /**
          * При нажатии на крестик стирается поле ввода
          */
         mButtonDeleteInputText.setOnClickListener(new View.OnClickListener() {
@@ -293,7 +305,7 @@ public class TranslationTab extends Fragment {
                         currentTranslation.setFavourite(1);
                         mImageButtonTrFavourite.setImageResource(R.drawable.ic_fav_on);
 
-                        Toast.makeText(getContext(), "Added in favourite", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getResources().getString(R.string.add_in_fav2), Toast.LENGTH_SHORT).show();
                         dbHandler.addTranslation(currentTranslation);
                     }
                 }

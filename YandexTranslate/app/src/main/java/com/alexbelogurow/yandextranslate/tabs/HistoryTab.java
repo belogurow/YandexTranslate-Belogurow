@@ -58,7 +58,6 @@ public class HistoryTab extends Fragment {
         mFabUpdate = (FloatingActionButton) view.findViewById(R.id.historyFabUpdate);
         mFabDelete = (FloatingActionButton) view.findViewById(R.id.historyFabDelete);
 
-        hideKeyboard();
         return view;
     }
 
@@ -157,17 +156,6 @@ public class HistoryTab extends Fragment {
                 });
 
         builder.create().show();
-    }
-
-    /**
-     * При открытии данного окна после перевода необходимо убрать клавиатуру
-     */
-    private void hideKeyboard() {
-        View view = getActivity().getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
     }
 
 }

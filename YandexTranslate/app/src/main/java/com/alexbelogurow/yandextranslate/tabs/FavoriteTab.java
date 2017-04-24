@@ -55,8 +55,6 @@ public class FavoriteTab extends Fragment {
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewHistory);
         mFabUpdate = (FloatingActionButton) view.findViewById(R.id.historyFabUpdate);
         mFabDelete = (FloatingActionButton) view.findViewById(R.id.historyFabDelete);
-
-        hideKeyboard();
         return view;
     }
 
@@ -156,16 +154,4 @@ public class FavoriteTab extends Fragment {
             }
         }
     }
-
-    /**
-     * При открытии данного окна после перевода необходимо убрать клавиатуру
-     */
-    private void hideKeyboard() {
-        View view = getActivity().getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
-    }
-
 }
