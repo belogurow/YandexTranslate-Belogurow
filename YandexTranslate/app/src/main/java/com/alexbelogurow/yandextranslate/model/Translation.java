@@ -3,13 +3,14 @@ package com.alexbelogurow.yandextranslate.model;
 import java.io.Serializable;
 
 /**
- * Created by alexbelogurow on 17.04.17.
+ * Класс Translation используется для хранения текущего перевода в окне TranslationTab
+ * и для добавления перевода в БД
  */
 
 public class Translation implements Serializable{
 
-    Integer id, favourite;
-    String from, to, text, translatedText;
+    private Integer id, favourite;
+    private String from, to, text, translatedText;
 
     public Translation() {
         this.favourite = 0;

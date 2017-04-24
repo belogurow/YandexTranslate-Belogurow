@@ -1,41 +1,39 @@
 package com.alexbelogurow.yandextranslate.adapter;
 
-import android.app.TabActivity;
 import android.content.Context;
-import android.support.design.widget.TabLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alexbelogurow.yandextranslate.R;
 import com.alexbelogurow.yandextranslate.dataBase.DBHandler;
 import com.alexbelogurow.yandextranslate.model.Translation;
-import com.alexbelogurow.yandextranslate.tabs.TranslationTab;
 
 import java.util.List;
 
 /**
- * Created by alexbelogurow on 18.04.17.
+ * Класс TabAdapter наследуется от RecyclerView.Adapter<> и формирует прокручиваемый
+ * список из CardView. В карточке содержится текст с его переводом, с какого и на какой
+ * язык был выполнен перевод. TabAdapter используется для вкладок истории и избранного.
  */
 
-public class HistoryTabAdapter extends RecyclerView.Adapter<HistoryTabAdapter.HistoryViewHolder> {
+public class TabAdapter extends RecyclerView.Adapter<TabAdapter.TabViewHolder> {
     private List<Translation> translationList;
     private Context context;
 
 
-    public HistoryTabAdapter(List<Translation> translationList, Context context) {
+    public TabAdapter(List<Translation> translationList, Context context) {
         this.translationList = translationList;
         this.context = context;
 
     }
 
-    public static class HistoryViewHolder extends RecyclerView.ViewHolder {
+    public static class TabViewHolder extends RecyclerView.ViewHolder {
         private CardView mCardView;
         private TextView mTextViewText,
                 mTextViewTrText,
@@ -44,7 +42,7 @@ public class HistoryTabAdapter extends RecyclerView.Adapter<HistoryTabAdapter.Hi
         private boolean isFav;
 
 
-        public HistoryViewHolder(View itemView) {
+        public TabViewHolder(View itemView) {
             super(itemView);
             mCardView = (CardView) itemView.findViewById(R.id.cardViewHistory);
             mTextViewText = (TextView) itemView.findViewById(R.id.textViewHistoryText);
@@ -54,16 +52,12 @@ public class HistoryTabAdapter extends RecyclerView.Adapter<HistoryTabAdapter.Hi
 
         }
 
-        /*@Override
-        public void onClick(View v) {
-            if (isFav) {
-                mImageButtonFav.setImageResource(R.drawable.ic_fav_on);
-            }
-
-
-        }  */
     }
 
+    /**
+     * Метод updateList вызывается после того, как в adapter произошли какие-либо изменения
+     * @param isFav отвечает за то, будут ли в списке переводы, добавленные в избранное или нет
+     */
     public void updateList(boolean isFav) {
         DBHandler dbHandler = new DBHandler(context);
         translationList.clear();
@@ -71,17 +65,18 @@ public class HistoryTabAdapter extends RecyclerView.Adapter<HistoryTabAdapter.Hi
         notifyDataSetChanged();
     }
 
+
     @Override
-    public HistoryTabAdapter.HistoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public TabViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.translation_item, parent, false);
-        HistoryViewHolder historyViewHolder = new HistoryViewHolder(view);
+        TabViewHolder historyViewHolder = new TabViewHolder(view);
 
 
         return historyViewHolder;
     }
 
     @Override
-    public void onBindViewHolder(final HistoryTabAdapter.HistoryViewHolder holder, final int position) {
+    public void onBindViewHolder(final TabViewHolder holder, final int position) {
         holder.mTextViewText.setText(translationList.get(position).getText());
         holder.mTextViewTrText.setText(translationList.get(position).getTranslatedText());
         holder.mTextViewFromToLang.setText((
@@ -98,6 +93,9 @@ public class HistoryTabAdapter extends RecyclerView.Adapter<HistoryTabAdapter.Hi
             holder.isFav = false;
         }
 
+        /*
+         * Обновление нового значения избранного данной записи в БД
+         */
         holder.mImageButtonFav.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,7 +110,8 @@ public class HistoryTabAdapter extends RecyclerView.Adapter<HistoryTabAdapter.Hi
                     dbHandler.addTranslation(translation);
                     dbHandler.close();
 
-                    Toast.makeText(context, "Added in favourite, update list", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, context.getString(R.string.add_in_fav),
+                            Toast.LENGTH_SHORT).show();
 
                 }
                 else {
@@ -127,7 +126,8 @@ public class HistoryTabAdapter extends RecyclerView.Adapter<HistoryTabAdapter.Hi
                     dbHandler.addTranslation(translation);
                     dbHandler.close();
 
-                    Toast.makeText(context, "Removed from favourite, update list", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, context.getString(R.string.remove_from_fav),
+                            Toast.LENGTH_SHORT).show();
 
                 }
             }

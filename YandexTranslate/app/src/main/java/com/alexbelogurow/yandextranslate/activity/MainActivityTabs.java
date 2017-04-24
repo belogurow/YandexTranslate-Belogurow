@@ -1,44 +1,35 @@
 package com.alexbelogurow.yandextranslate.activity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.util.ArrayMap;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 
 import com.alexbelogurow.yandextranslate.R;
-import com.alexbelogurow.yandextranslate.asyncTask.LanguageTask;
-import com.alexbelogurow.yandextranslate.model.Translation;
 import com.alexbelogurow.yandextranslate.tabs.FavoriteTab;
 import com.alexbelogurow.yandextranslate.tabs.HistoryTab;
 import com.alexbelogurow.yandextranslate.tabs.TranslationTab;
-import com.alexbelogurow.yandextranslate.utils.Constant;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by alexbelogurow on 17.04.17.
+ * Класс MainActivityTabs формирует ViewPager для отображения
+ * трех фрагментов: Переводчик, История, Избранное
  */
 
 public class MainActivityTabs extends AppCompatActivity {
-    private Toolbar toolbar;
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
+    private Toolbar mToolbar;
+    private TabLayout mTabLayout;
+    private ViewPager mViewPager;
 
 
     @Override
@@ -48,16 +39,16 @@ public class MainActivityTabs extends AppCompatActivity {
 
         setContentView(R.layout.activity_main_tabs);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
 
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
-        setupViewPager(viewPager);
+        mViewPager = (ViewPager) findViewById(R.id.viewpager);
+        setupViewPager(mViewPager);
 
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
+        mTabLayout = (TabLayout) findViewById(R.id.tabs);
+        mTabLayout.setupWithViewPager(mViewPager);
 
 
     }

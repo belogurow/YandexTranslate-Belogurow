@@ -1,7 +1,7 @@
 package com.alexbelogurow.yandextranslate.utils;
 
 /**
- * Created by alexbelogurow on 22.04.17.
+ * Класс Constant для хранения констант(в данном случае ключей)
  */
 
 public class Constant {

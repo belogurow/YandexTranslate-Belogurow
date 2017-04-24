@@ -9,6 +9,11 @@ import android.widget.TextView;
 
 import com.alexbelogurow.yandextranslate.R;
 
+/**
+ * Класс InfoActivity отображает список сервисов с активными ссылками,
+ * которые использует данное приложение: Яндекс.Переводчик, Яднекс.Словарь
+ */
+
 public class InfoActivity extends AppCompatActivity {
 
     private TextView mTextViewInfoTr,

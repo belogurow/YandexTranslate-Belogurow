@@ -43,9 +43,8 @@ import static com.alexbelogurow.yandextranslate.utils.Constant.KEY_TRANSLATE;
 
 
 /**
- * Created by alexbelogurow on 17.04.17.
+ * Главный фрагмент TranslationTab, который отвечает за перевод введенного текста
  */
-// FIXME не работает крестик удаления
 
 public class TranslationTab extends Fragment {
 
@@ -59,7 +58,6 @@ public class TranslationTab extends Fragment {
     private ImageButton mImageButtonTrFavourite;
     private TextView mTextViewSign;
 
-
     private TextView mTextViewLangFrom;
     private TextView mTextViewLangTo;
 
@@ -71,7 +69,7 @@ public class TranslationTab extends Fragment {
 
     public static ArrayMap<String, String> languages = null;
 
-    public static DBHandler dbHandler;
+    private DBHandler dbHandler;
 
     private Translation currentTranslation;
 
@@ -103,6 +101,7 @@ public class TranslationTab extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Заполняем список languages языками, полученными из асинхронной задачи
         languages = new ArrayMap<>();
         new LanguageTask(new LanguageTask.DownloadResponse() {
             @Override
@@ -115,9 +114,9 @@ public class TranslationTab extends Fragment {
                 "key=" + Constant.KEY_TRANSLATE +
                 "&ui=ru");
 
-
-
         dbHandler = new DBHandler(getContext());
+
+        // currentTranslation используется для хранения значений текущего перевода
         currentTranslation = new Translation();
 
     }
@@ -127,7 +126,9 @@ public class TranslationTab extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-
+        /**
+         * При нажатии на значок ⟷ меняется направление перевода
+         */
         mTextViewSign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -143,6 +144,9 @@ public class TranslationTab extends Fragment {
             }
         });
 
+        /**
+         * Вызывается startActivityfForResult для получения номера выбранного ключа в списке языков
+         */
         mTextViewLangTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -175,6 +179,9 @@ public class TranslationTab extends Fragment {
             }
         });
 
+        /**
+         * Аналогично предыдущему
+         */
         mTextViewLangFrom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -210,8 +217,10 @@ public class TranslationTab extends Fragment {
 
         mTextViewDictionary.setMovementMethod(new ScrollingMovementMethod());
 
-        // addTextChangedListener отслеживает изменение текста в mEditTextView,
-        // и если он произошел, отправляет запрос на получение json с переводом
+        /**
+         * addTextChangedListener отслеживает изменение текста в mEditTextView,
+         * и если оно произошло, отправляет запрос на получение json с переводом
+         */
         mEditTextInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
@@ -230,7 +239,6 @@ public class TranslationTab extends Fragment {
                 mImageButtonTrFavourite.setImageResource(R.drawable.ic_fav_off);
                 currentTranslation.setFavourite(0);
 
-                // метод getTranslate для получения перевода и словаря
                 if (s.toString().length() != 0) {
                     getTranslate();
                     mButtonDeleteInputText.setVisibility(Button.VISIBLE);
@@ -245,6 +253,9 @@ public class TranslationTab extends Fragment {
             }
         });
 
+        /**
+         * При нажатии на крестик стирается поле ввода
+         */
         mButtonDeleteInputText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -253,21 +264,22 @@ public class TranslationTab extends Fragment {
         });
 
 
+        /**
+         * При нажатии ENTER скрывается наэкранная клавиатура
+         */
         mEditTextInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                //if (actionId == EditorInfo.IME_ACTION_DONE) {
                 hideKeyboard();
                 Log.d(Log.DEBUG + "", event + "");
                 return true;
-                //}
-                //return false;
-
             }
         });
 
 
-        // кнопка добавления в избранное
+        /**
+         * Кнопка добавления в избранное текущего перевода
+         */
         mImageButtonTrFavourite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -289,6 +301,9 @@ public class TranslationTab extends Fragment {
         });
 
 
+        /**
+         * Если клавиатура не показывается, то добавить текущий перевод в историю (БД)
+         */
         mRootLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -297,12 +312,12 @@ public class TranslationTab extends Fragment {
                 }
             }
         });
-
-
-
-
     }
 
+    /**
+     * Показывает, закрыта ли клавиатура в данный момент
+     * @return
+     */
     private boolean keyboardIsHidden() {
         Rect r = new Rect();
         mRootLayout.getWindowVisibleDisplayFrame(r);
@@ -315,13 +330,13 @@ public class TranslationTab extends Fragment {
         return keypadHeight <= screenHeight * 0.15;
     }
 
-    // очистить поле ввода после нажатия на крестик "x"
-    public void deleteInputText(View view) {
-        mEditTextInput.setText("");
-        view.setVisibility(View.INVISIBLE);
-    }
-
-
+    /**
+     * Получаем данные из GetLanguageActivity для изменения параметров перевода такие как
+     * langFrom, langTo, isAutoLang
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         //Log.d(Log.DEBUG + "data_code", requestCode+"");
@@ -356,9 +371,11 @@ public class TranslationTab extends Fragment {
                 getTranslate();
             }
         }
-        //super.onActivityResult(requestCode, resultCode, data);
     }
 
+    /**
+     * Метод для получения Перевода и Словаря с помощью асинхронной задачи
+     */
     private void getTranslate() {
         if (isOnline()) {
             try {
@@ -417,6 +434,10 @@ public class TranslationTab extends Fragment {
         }
     }
 
+    /**
+     * Получение последнего перевода из БД, и если он не совпадает с текущим,
+     * то добавляем текущий в БД
+     */
     private void addTranslationToDB() {
         Log.d(Log.DEBUG + "-current", currentTranslation.toString());
         if (currentTranslation.getText().length() != 0 && TranslationTab.this.isVisible()) {
@@ -437,10 +458,15 @@ public class TranslationTab extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-
         saveState();
     }
 
+    /**
+     * Сохраняем состояние текущего перевода в sharedPreferences на случай закрытия приложения
+     *
+     * В данном случае отдал предпочтение sharedPreferences, так данных мало и
+     * могут быть получены по (ключ, значение)
+     */
     private void saveState() {
         SharedPreferences statePref = this.getActivity().
                 getSharedPreferences("lastTranslation", Context.MODE_PRIVATE);
@@ -462,6 +488,9 @@ public class TranslationTab extends Fragment {
         editor.apply();
     }
 
+    /**
+     * Загрузка сохраненного состояние
+     */
     private void loadState() {
         Log.d("data", "load State");
         SharedPreferences statePref = this.getActivity().
@@ -495,6 +524,10 @@ public class TranslationTab extends Fragment {
 
     }
 
+    /**
+     * Проверка на подключение к интернету
+     * @return
+     */
     public boolean isOnline() {
         ConnectivityManager cm =
                 (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -502,6 +535,9 @@ public class TranslationTab extends Fragment {
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
+    /**
+     * Используется, чтобы убрать клавиатуру с текущего экрана
+     */
     private void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(mEditTextInput.getWindowToken(), 0);

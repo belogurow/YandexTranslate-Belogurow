@@ -14,50 +14,49 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by alexbelogurow on 17.04.17.
+ * В качестве хранения истории и избранного была выбрана SQLite, так как
+ * данные должны быть структурированы. Так как данных будет много, то предполагается
+ * поиск и добавление данных, лучше всего это реализовать с помощью БД, а не sharedPreferences
+ *
+ * БД содержит одну таблицу с полями (id, text, translatedText, fromLang, toLang, favourite)
  */
-
-// TODO добавить метод для удаления только избранного
 public class DBHandler extends SQLiteOpenHelper {
 
-    // Database Version
     private static final int DATABASE_VERSION = 1;
-
-    // Database Name
     private static final String DATABASE_NAME = "TranslationHistory";
-
-    // Contacts table name
     private static final String TABLE_TRANSLATION = "Translations";
 
-    // Contacts Table Columns names
     private static final String KEY_ID = "id",
-            KEY_FROM = "fromLang",
-            KEY_TO = "toLang",
+            KEY_LANG_FROM = "fromLang",
+            KEY_LANG_TO = "toLang",
             KEY_TEXT = "text",
             KEY_TR_TEXT = "translatedText",
             KEY_FAVOURITE = "favorite";
-
-    //private static final String KEY_PH_NO = "phone_number";
 
 
     public DBHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    // Создание таблицы
+    /**
+     * Создание таблицы
+     * @param db БД
+     */
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_TRANSLATION + "(" +
                 KEY_ID + " INTEGER PRIMARY KEY," +
                 KEY_TEXT + " TEXT," +
                 KEY_TR_TEXT + " TEXT," +
-                KEY_FROM + " TEXT," +
-                KEY_TO + " TEXT," +
+                KEY_LANG_FROM + " TEXT," +
+                KEY_LANG_TO + " TEXT," +
                 KEY_FAVOURITE + " INTEGER" + ")";
         db.execSQL(CREATE_CONTACTS_TABLE);
     }
 
-    // Обновление таблицы
+    /**
+     * Обновление таблицы
+     */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
@@ -67,11 +66,21 @@ public class DBHandler extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    /**
+     * Добавление нового перевода в БД
+     *
+     * При добавлении новой записи используется следующий принцип -
+     * если запись с таким (text, langFrom, langTo) уже существует, то
+     * она удаляется, и добавляется новая, но уже с обновленными полями
+     *                    (например favourite поменял свое значение)
+     *
+     * @param translation перевод, который надо добавить
+     */
     public void addTranslation(Translation translation) {
         String SELECT_TRANSLATE = "SELECT * FROM " + TABLE_TRANSLATION +
                 " WHERE " + KEY_TEXT + " ='" + translation.getText() +
-                "' AND " + KEY_FROM + " ='" + translation.getFrom() + "'" +
-                " AND " + KEY_TO + " ='" + translation.getTo() + "'";
+                "' AND " + KEY_LANG_FROM + " ='" + translation.getFrom() + "'" +
+                " AND " + KEY_LANG_TO + " ='" + translation.getTo() + "'";
 
 
 
@@ -82,8 +91,6 @@ public class DBHandler extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             id = cursor.getString(cursor.getColumnIndex(KEY_ID));
         }
-        //Log.d(Log.DEBUG + "-add", count + "");
-
 
         cursor.close();
         db.close();
@@ -99,8 +106,8 @@ public class DBHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_TEXT, translation.getText());
         values.put(KEY_TR_TEXT, translation.getTranslatedText());
-        values.put(KEY_FROM, translation.getFrom());
-        values.put(KEY_TO, translation.getTo());
+        values.put(KEY_LANG_FROM, translation.getFrom());
+        values.put(KEY_LANG_TO, translation.getTo());
         values.put(KEY_FAVOURITE, translation.getFavourite());
 
         //Log.d(Log.DEBUG + "", "insert");
@@ -109,23 +116,14 @@ public class DBHandler extends SQLiteOpenHelper {
 
 
         db1.close();
-
-        /*SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_TEXT, translation.getText());
-        values.put(KEY_TR_TEXT, translation.getTranslatedText());
-        values.put(KEY_FROM, translation.getFrom());
-        values.put(KEY_TO, translation.getTo());
-        values.put(KEY_FAVOURITE, translation.getFavourite());
-
-        //db.insertWithOnConflict(TABLE_TRANSLATION, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-        db.insert(TABLE_TRANSLATION, null, values);
-
-        db.close(); */
     }
 
 
+    /**
+     * Получение перевода из БД по id
+     * @param id id перевода
+     * @return
+     */
     public Translation getTranslate(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -133,8 +131,8 @@ public class DBHandler extends SQLiteOpenHelper {
                 KEY_ID,
                 KEY_TEXT,
                 KEY_TR_TEXT,
-                KEY_FROM,
-                KEY_TO,
+                        KEY_LANG_FROM,
+                        KEY_LANG_TO,
                 KEY_FAVOURITE},
                 KEY_ID + "=?", new String[] { String.valueOf(id) }, null, null, null, null);
 
@@ -152,6 +150,10 @@ public class DBHandler extends SQLiteOpenHelper {
         return translation;
     }
 
+    /**
+     * Получение последнего перевода из БД
+     * @return
+     */
     public Translation getLastTranslation() {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -173,10 +175,15 @@ public class DBHandler extends SQLiteOpenHelper {
         return translation;
     }
 
+    /**
+     * Получение списка всем переводов из БД
+     * @param fav равно true, если нужен список только тех переводов,
+     *            которые добавлены в избранное
+     * @return
+     */
     public List<Translation> getAllTranslations(boolean fav) {
 
         List<Translation> translationsList = new ArrayList<>();
-        // Select All Query
         String selectQuery;
         if (fav) {
             selectQuery = "SELECT * FROM " + TABLE_TRANSLATION +
@@ -187,7 +194,6 @@ public class DBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
-        // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
                 Translation translation = new Translation(
@@ -197,7 +203,6 @@ public class DBHandler extends SQLiteOpenHelper {
                         cursor.getString(3),
                         cursor.getString(4),
                         Integer.parseInt(cursor.getString(5)));
-                // Adding contact to list
                 translationsList.add(translation);
             } while (cursor.moveToNext());
         }
@@ -205,19 +210,13 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
 
         Collections.reverse(translationsList);
-
-        // return contact list
         return translationsList;
     }
 
-    // Deleting single contact
-    public void deleteTranslation(Translation translation) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_TRANSLATION, KEY_ID + " = ?",
-                new String[] { String.valueOf(translation.getId()) });
-        db.close();
-    }
 
+    /**
+     * Удаление всех переводов из БД, которые находятся в избранном
+     */
     public void deleteFavTranslations() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_TRANSLATION, KEY_FAVOURITE + " = ?",
@@ -225,6 +224,9 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
     }
 
+    /**
+     * Удаление всех переводов из БД
+     */
     public void deleteAllTranslations() {
         SQLiteDatabase db = this.getReadableDatabase();
         db.delete(TABLE_TRANSLATION, null, null);
@@ -232,8 +234,10 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-
-
+    /**
+     * Получение кол-ва записей в БД
+     * @return
+     */
     public int getTranslationsCount() {
         String countQuery = "SELECT * FROM " + TABLE_TRANSLATION;
         SQLiteDatabase db = this.getReadableDatabase();
@@ -243,7 +247,6 @@ public class DBHandler extends SQLiteOpenHelper {
         cursor.close();
         db.close();
 
-        // return count
         return count;
     }
 

@@ -16,25 +16,25 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 
 import com.alexbelogurow.yandextranslate.R;
-import com.alexbelogurow.yandextranslate.adapter.HistoryTabAdapter;
+import com.alexbelogurow.yandextranslate.adapter.TabAdapter;
 import com.alexbelogurow.yandextranslate.dataBase.DBHandler;
 import com.alexbelogurow.yandextranslate.model.Translation;
 
 import java.util.List;
 
 /**
- * Created by alexbelogurow on 17.04.17.
+ * Фрагмент HistoryTab отображает список истории переводов
  */
 
 public class HistoryTab extends Fragment {
     private DBHandler db;
     private RecyclerView mRecyclerView;
-    private HistoryTabAdapter adapter;
+    private TabAdapter mAdapter;
 
     private FloatingActionButton mFabUpdate;
     private FloatingActionButton mFabDelete;
 
-    private List<Translation> translationList;
+    private List<Translation> mTranslationList;
 
     public HistoryTab() {
         // Required empty public constructor
@@ -66,8 +66,6 @@ public class HistoryTab extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-
-
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.setHasFixedSize(true);
@@ -75,7 +73,7 @@ public class HistoryTab extends Fragment {
         mFabUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                adapter.updateList(false);
+                mAdapter.updateList(false);
             }
         });
 
@@ -86,6 +84,9 @@ public class HistoryTab extends Fragment {
             }
         });
 
+        /**
+         * Float Action Button будут скрываться про прокрутке списка
+         */
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -106,33 +107,36 @@ public class HistoryTab extends Fragment {
                 }
             }
         });
-
-        //initializeData();
         initializeAdapter();
     }
 
+    /**
+     * Инициализация адаптера
+     */
     private void initializeAdapter() {
-        translationList = db.getAllTranslations(false);
-        adapter = new HistoryTabAdapter(translationList, getContext());
-        mRecyclerView.setAdapter(adapter);
-        //adapter.setHasStableIds(true);
+        mTranslationList = db.getAllTranslations(false);
+        mAdapter = new TabAdapter(mTranslationList, getContext());
+        mRecyclerView.setAdapter(mAdapter);
     }
 
+    /**
+     * Вызывается при показе пользователю на экране
+     * @param isVisibleToUser true - если виден, false - иначе
+     */
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
 
         if (isVisibleToUser) {
             Log.i("visible", "true");
-            //initializeAdapter();
-            //translationList = db.getAllTranslations(false);
-            //mRecyclerView.setAdapter(adapter);
-            //adapter.notifyDataSetChanged();
-            adapter.updateList(false);
+            mAdapter.updateList(false);
 
         }
     }
 
+    /**
+     * Показ AlertDialog для подтверждения всей истории
+     */
     private void showAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.history)
@@ -142,7 +146,7 @@ public class HistoryTab extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         db.deleteAllTranslations();
-                        adapter.updateList(false);
+                        mAdapter.updateList(false);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -155,6 +159,9 @@ public class HistoryTab extends Fragment {
         builder.create().show();
     }
 
+    /**
+     * При открытии данного окна после перевода необходимо убрать клавиатуру
+     */
     private void hideKeyboard() {
         View view = getActivity().getCurrentFocus();
         if (view != null) {

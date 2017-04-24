@@ -14,7 +14,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Created by alexbelogurow on 22.03.17.
+ * Асинхронная задача для получения перевода в виде JSON
  */
 
 public class TranslateTask extends AsyncTask<String, Void, String> {
@@ -58,6 +58,10 @@ public class TranslateTask extends AsyncTask<String, Void, String> {
         return "";
     }
 
+    /**
+     * Разбор полученного JSON, в делегат передается переведенный текст
+     * @param result JSON
+     */
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);

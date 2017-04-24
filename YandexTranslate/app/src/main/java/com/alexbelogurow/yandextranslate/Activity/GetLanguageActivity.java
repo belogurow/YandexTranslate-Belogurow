@@ -9,12 +9,17 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Switch;
-import android.widget.Toast;
 
 import com.alexbelogurow.yandextranslate.R;
 import com.alexbelogurow.yandextranslate.tabs.TranslationTab;
 
 import java.util.ArrayList;
+
+/**
+ * Класс GetLanguageActivity формирует список языков на которые(с которых)
+ * может осуществляться перевод. При нажатии на язык, его позиция в списке передается
+ * предыдущему Activity.
+ */
 
 public class GetLanguageActivity extends AppCompatActivity {
 
@@ -60,19 +65,7 @@ public class GetLanguageActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent mainMenu1 = new Intent();
 
-                /*
-                if (mSwitchAutoLang.isChecked()) {
-                    //Toast.makeText(getApplicationContext(), "checked", Toast.LENGTH_SHORT).show();
-                    //Toast.makeText(getApplicationContext(), mSwitchAutoLang.isChecked() + "", Toast.LENGTH_SHORT).show();
-                    mainMenu.putExtra("isAutoLang", true);
-                    setResult(RESULT_OK, mainMenu);
-                } else {
-                    setResult(RESULT_CANCELED, mainMenu);
-                } */
-                //setResult(RESULT_CANCELED, mainMenu);
                 mainMenu1.putExtra("isAutoLang", mSwitchAutoLang.isChecked());
-                //Toast.makeText(getApplicationContext(), getIntent().getIntExtra("CODE", -1), Toast.LENGTH_SHORT).show();
-                //mainMenu.putExtra("code", getIntent().getIntExtra("CODE", -1));
                 setResult(RESULT_OK, mainMenu1);
                 //onBackPressed();
                 finish();
@@ -100,7 +93,6 @@ public class GetLanguageActivity extends AppCompatActivity {
                 mainMenu.putExtra("code", code);
                 setResult(RESULT_OK, mainMenu);
 
-                //onBackPressed();
                 finish();
 
             }

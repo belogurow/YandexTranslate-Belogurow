@@ -16,26 +16,25 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 
 import com.alexbelogurow.yandextranslate.R;
-import com.alexbelogurow.yandextranslate.adapter.HistoryTabAdapter;
+import com.alexbelogurow.yandextranslate.adapter.TabAdapter;
 import com.alexbelogurow.yandextranslate.dataBase.DBHandler;
 import com.alexbelogurow.yandextranslate.model.Translation;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
- * Created by alexbelogurow on 17.04.17.
+ * Фрагмент FavoriteTab отображает список переводов, которые добавлены в избранное
  */
 
 public class FavoriteTab extends Fragment {
     private DBHandler db;
-    private RecyclerView recyclerView;
-    private HistoryTabAdapter adapter;
+    private RecyclerView mRecyclerView;
+    private TabAdapter mAdapter;
 
     private FloatingActionButton mFabUpdate;
     private FloatingActionButton mFabDelete;
 
-    private List<Translation> favTranslationList;
+    private List<Translation> mFavTranslationList;
 
     public FavoriteTab() {
         // Required empty public constructor
@@ -46,17 +45,14 @@ public class FavoriteTab extends Fragment {
         super.onCreate(savedInstanceState);
 
         db = new DBHandler(getContext());
-
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_history, container, false);
-        // Inflate the layout for this fragment
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewHistory);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewHistory);
         mFabUpdate = (FloatingActionButton) view.findViewById(R.id.historyFabUpdate);
         mFabDelete = (FloatingActionButton) view.findViewById(R.id.historyFabDelete);
 
@@ -68,16 +64,14 @@ public class FavoriteTab extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-
-
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+        mRecyclerView.setHasFixedSize(true);
 
         mFabUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                adapter.updateList(true);
+                mAdapter.updateList(true);
             }
         });
 
@@ -85,13 +79,13 @@ public class FavoriteTab extends Fragment {
             @Override
             public void onClick(View v) {
                 showAlertDialog();
-
-                //db.deleteFavTranslations();
-                //adapter.updateList(true);
             }
         });
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        /**
+         * Float Action Button будут скрываться про прокрутке списка
+         */
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
@@ -111,11 +105,12 @@ public class FavoriteTab extends Fragment {
                 }
             }
         });
-
-        //initializeData();
         initializeAdapter();
     }
 
+    /**
+     * Показ AlertDialog для подтверждения удаления избранного
+     */
     private void showAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.favourite)
@@ -125,7 +120,7 @@ public class FavoriteTab extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         db.deleteFavTranslations();
-                        adapter.updateList(true);
+                        mAdapter.updateList(true);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -138,30 +133,33 @@ public class FavoriteTab extends Fragment {
         builder.create().show();
     }
 
+    /**
+     * Инициализация адаптера
+     */
     private void initializeAdapter() {
-
-        favTranslationList = db.getAllTranslations(true);
-        adapter = new HistoryTabAdapter(favTranslationList, getContext());
-        recyclerView.setAdapter(adapter);
-        //adapter.setHasStableIds(true);
+        mFavTranslationList = db.getAllTranslations(true);
+        mAdapter = new TabAdapter(mFavTranslationList, getContext());
+        mRecyclerView.setAdapter(mAdapter);
     }
 
+    /**
+     * Вызывается при показе пользователю на экране
+     * @param isVisibleToUser true - если виден, false - иначе
+     */
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
 
         if (isVisibleToUser) {
-            Log.i("adapter", (adapter == null) + "");
-            //initializeAdapter();
-            //recyclerView.setAdapter(adapter);
-            //adapter.notifyDataSetChanged();
-
-            if (adapter != null) {
-                adapter.updateList(true);
+            if (mAdapter != null) {
+                mAdapter.updateList(true);
             }
         }
     }
 
+    /**
+     * При открытии данного окна после перевода необходимо убрать клавиатуру
+     */
     private void hideKeyboard() {
         View view = getActivity().getCurrentFocus();
         if (view != null) {

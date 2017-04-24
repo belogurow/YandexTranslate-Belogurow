@@ -2,6 +2,7 @@ package com.alexbelogurow.yandextranslate.asyncTask;
 
 import android.os.AsyncTask;
 import android.support.v4.util.ArrayMap;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,7 +15,12 @@ import java.net.URL;
 import java.util.Iterator;
 
 /**
- * Created by alexbelogurow on 28.03.17.
+ * Асинхронная задача для получения списка языков в виде JSON
+ *
+ * Решил не хранить список языков в strings.xml, так как список языков
+ * может пополняться или изменяться в дальнейшем. Поэтому при каждом запуске
+ * приложение будет показвать актуальные языки на которые и с которых
+ * можно осуществлять перевод
  */
 
 public class LanguageTask extends AsyncTask<String, Void, String> {
@@ -59,6 +65,14 @@ public class LanguageTask extends AsyncTask<String, Void, String> {
         return "";
     }
 
+    /**
+     * Разбор JSON и их упаковка в виде (ключ, значение) в ArrayMap
+     *
+     * В качестве словаря используется ArrayMap, так как он является более
+     * эффективным аналогом HashMap
+     *
+     * @param result JSON
+     */
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
@@ -67,22 +81,18 @@ public class LanguageTask extends AsyncTask<String, Void, String> {
             JSONObject jsonObject = new JSONObject(result);
             JSONObject langs = jsonObject.getJSONObject("langs");
             Iterator<?> keys = langs.keys();
+
             ArrayMap<String, String> arrayOfLangs = new ArrayMap<>();
-            //Log.i("Array", jsonArray.toString());
+
             while (keys.hasNext()) {
                 String key = keys.next().toString();
-                //Log.i("o", key + " : " + langs.getString(key));
                 arrayOfLangs.put(key, langs.getString(key));
-                //TranslationTab.languages.put(key, langs.getString(key));
-                //MainActivity.languages.put(key, langs.getString(key));
             }
-            //Log.i("Language", langs.getString("langs"));
 
-
-            //Log.i("HashMap2", MainActivity.languages.toString());
             delegate.processLangsFinish(arrayOfLangs);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
+
 }
