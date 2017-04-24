@@ -145,7 +145,7 @@ public class TranslationTab extends Fragment {
         });
 
         /**
-         * Вызывается startActivityfForResult для получения номера выбранного ключа в списке языков
+         * Вызывается startActivityForResult для получения номера выбранного ключа в списке языков
          */
         mTextViewLangTo.setOnClickListener(new View.OnClickListener() {
             @Override
